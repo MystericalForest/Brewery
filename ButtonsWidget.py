@@ -7,16 +7,20 @@ class ButtonsWidget(QWidget):
         super().__init__()
 
         self.ret_SP_button = QPushButton('Ret Setpoint', self)
-        self.ret_SP_button.clicked.connect(self.open_setpoint_dialog)
+        self.ret_SP_button.clicked.connect(self.open_setpoint_dialog) 
+        self.ret_SP_button.resize(150, 100) 
  
         self.settings_button = QPushButton('Settings', self)
         self.settings_button.clicked.connect(self.open_setpoint_dialog)
+        self.settings_button.resize(150, 100) 
 
         self.start_button = QPushButton('Start', self)
         self.start_button.clicked.connect(self.start_reading)
+        self.start_button.resize(150, 100) 
  
         self.stop_button = QPushButton('Stop', self)
         self.stop_button.clicked.connect(self.stop_reading)
+        self.stop_button.resize(150, 100) 
 
         # Opretter en gruppe til formområdet
         self.group_box = QGroupBox(title)

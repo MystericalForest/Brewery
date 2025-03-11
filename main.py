@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushBut
 import SignalData as SD
 import ChangeSetpointDialog
 import SerialThreat as ST
-import ButtonsWidget as BW, TermostatWidget as TW, HeaderWidget as HW
+import ButtonsWidget as BW, TermostatWidget as TW, HeaderWidget as HW, WatchWidget as WW
         
 # GUI Klasse
 class TemperatureApp(QWidget):
@@ -26,6 +26,7 @@ class TemperatureApp(QWidget):
         self.termostat2 = TW.TermostatWidget("Mæskegryde")
         self.termostat3 = TW.TermostatWidget("Kogegryde")
         self.buttons = BW.ButtonsWidget("Control")
+        self.watch = WW.WatchWidget("Mæsketid", "Kogetid", "Pause")
 
         # Opretter et overordnet layout og tilføjer widgets til det
         main_layout = QGridLayout()
@@ -34,11 +35,12 @@ class TemperatureApp(QWidget):
         main_layout.addWidget(self.termostat2.get_widget(), 1, 1)
         main_layout.addWidget(self.termostat3.get_widget(), 1, 2)
         main_layout.addWidget(self.buttons.get_widget(), 1, 3)
+        main_layout.addWidget(self.watch, 2, 0, 1, 4)
 
         self.setLayout(main_layout)
         # Sæt vinduets titel og størrelse
         self.setWindowTitle('Brew Control')
-        self.setGeometry(100, 100, 800, 300)
+        self.setGeometry(100, 100, 800, 400)
 
     def update_temperature(self, data):
         # Opdater GUI'en med den modtagne temperatur

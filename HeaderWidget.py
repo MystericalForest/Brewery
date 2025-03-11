@@ -7,10 +7,10 @@ class HeaderWidget(QWidget):
         
         self.header = QLabel("BrewControl", self)
         self.header.setAlignment(Qt.AlignCenter)
-        self.header.setStyleSheet("font-size: 30px;")
+        self.header.setStyleSheet("font-size: 60px;")
         
         self.status_label = QLabel("Advarsel: Temperatur er lav!", self)
-        self.status_label.setAlignment(Qt.AlignCenter)
+        self.status_label.setAlignment(Qt.AlignRight)
         self.status_label.setStyleSheet("font-size: 18px;")
 
         # Opret layout
