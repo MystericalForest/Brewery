@@ -27,6 +27,7 @@ class TemperatureApp(QWidget):
         self.termostat3 = TW.TermostatWidget("Kogegryde")
         self.buttons = BW.ButtonsWidget("Control")
         self.watch = WW.WatchWidget("Mæsketid", "Kogetid", "Pause")
+        self.watch.set_time(1000, 5000, 10000)
 
         # Opretter et overordnet layout og tilføjer widgets til det
         main_layout = QGridLayout()

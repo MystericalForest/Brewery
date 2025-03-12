@@ -1,12 +1,52 @@
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushButton, QLineEdit, QSlider, QDialog, QGroupBox
 import datetime
 
-class Watch:
-    def __init__(self, seconds):
+class Watch(QWidget):
+    def __init__(self, name, seconds):
+        super().__init__()
         self.seconds = seconds
         self.remainer_seconds = seconds
         self.running = False
+        
+        self.watch = QLabel(self.get_time_as_text(), self)
+        self.watch.setAlignment(Qt.AlignCenter)
+        self.watch.setStyleSheet("font-size: 40px;")
+        
+        self.watch_label = QLabel(name, self)
+        self.watch_label.setAlignment(Qt.AlignCenter)
+        self.watch_label.setStyleSheet("font-size: 18px;")
+
+        self.start_button = QPushButton('Start', self)
+        self.start_button.clicked.connect(self.start) 
+        self.start_button.enabled = True
+ 
+        self.stop_button = QPushButton('Stop', self)
+        self.stop_button.clicked.connect(self.stop)
+        self.stop_button.enabled = False
+
+        # Opret layout
+        layout = QGridLayout()
+        layout.addWidget(self.watch, 0, 0, 1, 2)
+        layout.addWidget(self.watch_label, 1, 0, 1, 2)
+        layout.addWidget(self.start_button, 2, 0)
+        layout.addWidget(self.stop_button, 2, 1)
+
+        self.setLayout(layout)
+
+        timer = QTimer(self, interval=1000, timeout=self.handle_timeout)
+        timer.start()
+
+    def paintEvent(self, event):
+        self.watch.setText(self.get_time_as_text())
+
+    def handle_timeout(self):
+        if (self.running): 
+            self.remainer_seconds = self.remainer_seconds - 1
+            self.update()
+
+    def get_widget(self):
+        return self
         
     def start(self):
         self.running = True
@@ -24,47 +64,28 @@ class Watch:
     def set_time(self, seconds):
         self.seconds = seconds
         self.remainer_seconds = seconds
+        self.update()
 
 class WatchWidget(QWidget):
     def __init__(self, watch1_name, watch2_name, watch3_name):
         super().__init__()
         
-        self.clWatch = Watch(1000)
+        self.watch1 = Watch(watch1_name, 1000)
+        self.watch2 = Watch(watch2_name, 1000)
+        self.watch3 = Watch(watch3_name, 1000)
         
-        self.watch1 = QLabel(self.clWatch.get_time_as_text(), self)
-        self.watch1.setAlignment(Qt.AlignCenter)
-        self.watch1.setStyleSheet("font-size: 40px;")
-        
-        self.watch_label1 = QLabel(watch1_name, self)
-        self.watch_label1.setAlignment(Qt.AlignCenter)
-        self.watch_label1.setStyleSheet("font-size: 18px;")
-        
-        self.watch2 = QLabel("22:53", self)
-        self.watch2.setAlignment(Qt.AlignCenter)
-        self.watch2.setStyleSheet("font-size: 40px;")
-        
-        self.watch_label2 = QLabel(watch2_name, self)
-        self.watch_label2.setAlignment(Qt.AlignCenter)
-        self.watch_label2.setStyleSheet("font-size: 18px;")
-        
-        self.watch3 = QLabel("08:26", self)
-        self.watch3.setAlignment(Qt.AlignCenter)
-        self.watch3.setStyleSheet("font-size: 40px;")
-        
-        self.watch_label3 = QLabel(watch3_name, self)
-        self.watch_label3.setAlignment(Qt.AlignCenter)
-        self.watch_label3.setStyleSheet("font-size: 18px;")
-
         # Opret layout
         layout = QGridLayout()
         layout.addWidget(self.watch1, 0, 0)
         layout.addWidget(self.watch2, 0, 1)
         layout.addWidget(self.watch3, 0, 2)
-        layout.addWidget(self.watch_label1, 1, 0)
-        layout.addWidget(self.watch_label2, 1, 1)
-        layout.addWidget(self.watch_label3, 1, 2)
 
         self.setLayout(layout)
 
     def get_widget(self):
         return self
+
+    def set_time(self, second1, second2, second3):
+        self.watch1.set_time(second1)
+        self.watch2.set_time(second2)
+        self.watch3.set_time(second3)
