@@ -2,8 +2,17 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushButton, QLineEdit, QSlider, QDialog, QGroupBox
 
 class TermostatWidget(QWidget):
+    # Opretter et signal, der sender dataene
+    temperature_updated = pyqtSignal(int, int)  # Temperatur, Setpoint, Heating Status
+
     def __init__(self, title):
         super().__init__()
+        
+        self.on_button = QPushButton("On", self)
+        self.on_button.setCheckable(True) # setting checkable to true
+        self.on_button.clicked.connect(self.changeState) # setting calling method by button
+        self.on_button.setStyleSheet("background-color : lightblue") # setting default color of button to light-blue
+        self.on_button.setChecked(True)
         
         self.header1 = QLabel(title, self)
         self.header1.setAlignment(Qt.AlignCenter)
@@ -27,17 +36,31 @@ class TermostatWidget(QWidget):
 
         # Opret layout
         layout = QGridLayout()
-        layout.addWidget(self.header1,0,0)
-        layout.addWidget(self.temp_label,1,0)
-        layout.addWidget(self.sp_label,2,0)
-        layout.addWidget(self.statustext,3,0)
+        layout.addWidget(self.on_button,0,0)
+        layout.addWidget(self.header1,1,0)
+        layout.addWidget(self.temp_label,2,0)
+        layout.addWidget(self.sp_label,3,0)
+        layout.addWidget(self.statustext,4,0)
         self.group_box.setLayout(layout)
 
-    def update_temperature(self, temperature, setpoint, heating):
+        # Forbinder signalet til slotten
+        self.temperature_updated.connect(self.update_temperature)
+        
+    def changeState(self):
+        if self.on_button.isChecked(): # if button is checked
+            self.on_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
+            self.on_button.setText("On")
+        else: # if it is unchecked
+            self.on_button.setStyleSheet("background-color : lightgrey") # set background color back to light-grey
+            self.on_button.setText("Off")
+ 
+    def update_temperature(self, temperature, setpoint):
         # Opdater GUI'en med den modtagne temperatur
-        self.temp_label.setText(temperature)
-        self.sp_label.setText(setpoint)
-        self.statustext.setEnabled(heating)
+        self.temp_label.setText(f"{temperature} °C")
+        self.temp_label.repaint()  # Tvinger en opdatering af labelen
+        self.sp_label.setText(f"(SP: {setpoint} °C)")
+        self.sp_label.repaint()  # Tvinger en opdatering af labelen
+#        self.statustext.setEnabled(heating)
 
     def get_widget(self):
         return self.group_box

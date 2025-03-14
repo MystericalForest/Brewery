@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushButton, QLineEdit, QSlider, QDialog, QGroupBox
-import ChangeSetpointDialog
+import ChangeSetpointDialog, SettingsDialog
 
 class ButtonsWidget(QWidget):
     def __init__(self, title):
@@ -11,7 +11,7 @@ class ButtonsWidget(QWidget):
         self.ret_SP_button.resize(150, 100) 
  
         self.settings_button = QPushButton('Settings', self)
-        self.settings_button.clicked.connect(self.open_setpoint_dialog)
+        self.settings_button.clicked.connect(self.open_setting_dialog)
         self.settings_button.resize(150, 100) 
 
         self.start_button = QPushButton('Start', self)
@@ -36,8 +36,12 @@ class ButtonsWidget(QWidget):
     def open_setpoint_dialog(self):
         # Åbner det nye vindue
         self.changeSetpointDialog = ChangeSetpointDialog.ChangeSetpointDialog(self.setpoint1, self.setpoint2, self.setpoint3)
-        print(self.setpoint1)
-        self.changeSetpointDialog.values_transferred.connect(self.ret_setpoint)
+  #      self.changeSetpointDialog.values_transferred.connect(self.ret_setpoint)
+
+    def open_setting_dialog(self):
+        # Åbner det nye vindue
+        self.SettingsDialog = SettingsDialog.SettingsDialog(self.setpoint1, self.setpoint2, self.setpoint3)
+ #       self.SettingsDialog.values_transferred.connect(self.ret_setpoint)
 
     def ret_setpoint(self, setpoint1, setpoint2, setpoint3):
         Data ={'Setpoint1':setpoint1,
