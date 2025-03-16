@@ -1,6 +1,27 @@
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushButton, QLineEdit, QSlider, QDialog, QGroupBox
 
+class TermoData():
+    def __init__(self):
+        self.temperature=0
+        self.setpoint=0
+        self.heating=False
+
+class TermoDataClass(QObject):
+    # Signal, der bliver sendt, når dataene ændres
+    dataChanged = pyqtSignal(TermoData)
+
+    def __init__(self):
+        super().__init__()
+        self.data=TermoData()
+
+    def update_data(self, temperature, setpoint, heating):
+        self.data.temperature=temperature
+        self.data.setpoint=setpoint
+        self.data.heating=heating
+        # Emit signalet med den nye værdi
+        self.dataChanged.emit(self.data)
+         
 class TermostatWidget(QWidget):
     # Opretter et signal, der sender dataene
     temperature_updated = pyqtSignal(int, int)  # Temperatur, Setpoint, Heating Status

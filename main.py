@@ -7,22 +7,26 @@ import ChangeSetpointDialog
 import SerialThreat as ST
 import ButtonsWidget as BW, TermostatWidget as TW, HeaderWidget as HW, WatchWidget as WW, RelayWidget as RW
 import random
+import SerialConnector as SD, SignalData
 
 # GUI Klasse
 class TemperatureApp(QWidget):
-    def __init__(self):
+    def __init__(self, serialConnector):
         super().__init__()
+        self.sd=SD.SerialConnector('/dev/ttyACM0')
         self.setpoint1=0
         self.setpoint2=0
         self.setpoint3=0
+        self.termoData = TW.TermoDataClass()
 
         self.initUI()
 
         # Opret en timer
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_temperature)  # Forbinder timerens signal til en slot
-        self.timer.start(3000)  # Starter timeren og opdaterer hver 1000 ms (3 sekund)
+        timer = QTimer(self, interval=3000, timeout=self.update_temperature)
+        timer.start()
 
+        serialConnector.new_data_signal.connect(self.update_temperature)
+        
     def initUI(self):
         super().__init__()
 
@@ -52,28 +56,18 @@ class TemperatureApp(QWidget):
         self.setGeometry(100, 100, 800, 400)
 
     def update_temperature(self): #, data):
+        data=SignalData.SignalData(self.sd.get_temperature())
         # Opdater GUI'en med den modtagne temperatur
-        self.termostat1.temperature_updated.emit(50+random.randrange(-5, 5),60)
-        self.termostat2.temperature_updated.emit(75+random.randrange(-5, 5),78)
-        self.termostat3.temperature_updated.emit(95+random.randrange(-2, 5),100) 
-##        self.termostat1(data.get_temperatur1_text(),
-##                        data.get_SP1_text(),
-##                        data.heat1)
-##        self.termostat2(data.get_temperatur1_text(),
-##                        data.get_SP1_text(),
-##                        data.heat1)
-##        self.termostat3(data.get_temperatur1_text(),
-##                        data.get_SP1_text(),
-##                        data.heat1)
-#        self.setpoint1=data.setpoint1
-#        self.setpoint2=data.setpoint2
-#        self.setpoint3=data.setpoint3
-        
+        self.termostat1.temperature_updated.emit(data.termostartData1.temperatur,data.termostartData1.setpoint)
+        self.termostat2.temperature_updated.emit(data.termostartData2.temperatur,data.termostartData2.setpoint)
+        self.termostat3.temperature_updated.emit(data.termostartData3.temperatur,data.termostartData3.setpoint) 
+
 # Hovedfunktion
 def main():
     app = QApplication(sys.argv)
+    serialConnector = SD.SerialConnector('/dev/ttyACM0')
 
-    window = TemperatureApp()
+    window = TemperatureApp(serialConnector)
     window.show()
 
     sys.exit(app.exec_())
