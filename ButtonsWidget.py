@@ -35,7 +35,8 @@ class ButtonsWidget(QWidget):
 
     def open_setpoint_dialog(self):
         # Åbner det nye vindue
-        self.changeSetpointDialog = ChangeSetpointDialog.ChangeSetpointDialog(self.setpoint1, self.setpoint2, self.setpoint3)
+        self.changeSetpointDialog = ChangeSetpointDialog.ChangeSetpointDialog(50, 40, 30)
+    #    self.changeSetpointDialog = ChangeSetpointDialog.ChangeSetpointDialog(self.setpoint1, self.setpoint2, self.setpoint3)
   #      self.changeSetpointDialog.values_transferred.connect(self.ret_setpoint)
 
     def open_setting_dialog(self):

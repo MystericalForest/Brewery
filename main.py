@@ -36,7 +36,7 @@ class TemperatureApp(QWidget):
         self.termostat2 = TW.TermostatWidget("Mæskegryde")
         self.termostat3 = TW.TermostatWidget("Kogegryde")
         self.buttons = BW.ButtonsWidget("Control")
-        self.relays = RW.RelayWidget("Pumpe", "Lys", "Støvsuger", "Kran")
+        self.relays = RW.RelayWidget(self,"Pumpe", "Lys", "Støvsuger", "Kran")
         self.watch = WW.WatchWidget("Mæsketid", "Kogetid", "Pause")
         self.watch.set_time(1000, 5000, 10000)
 
@@ -54,13 +54,17 @@ class TemperatureApp(QWidget):
         # Sæt vinduets titel og størrelse
         self.setWindowTitle('Brew Control')
         self.setGeometry(100, 100, 800, 400)
+    
+    def set_relay_1(self, value):
+        data=SignalData.SignalData(self.sd.set_relay_1(value))
+        print(data)
 
     def update_temperature(self): #, data):
         data=SignalData.SignalData(self.sd.get_temperature())
         # Opdater GUI'en med den modtagne temperatur
-        self.termostat1.temperature_updated.emit(data.termostartData1.temperatur,data.termostartData1.setpoint)
-        self.termostat2.temperature_updated.emit(data.termostartData2.temperatur,data.termostartData2.setpoint)
-        self.termostat3.temperature_updated.emit(data.termostartData3.temperatur,data.termostartData3.setpoint) 
+        self.termostat1.temperature_updated.emit(data.termostatData1.temperatur,data.termostatData1.setpoint)
+        self.termostat2.temperature_updated.emit(data.termostatData2.temperatur,data.termostatData2.setpoint)
+        self.termostat3.temperature_updated.emit(data.termostatData3.temperatur,data.termostatData3.setpoint) 
 
 # Hovedfunktion
 def main():
