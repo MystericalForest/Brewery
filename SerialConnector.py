@@ -11,10 +11,16 @@ class SerialConnector(QObject):
     
     def __init__(self, port, baudrate=9600):
         super().__init__()
+        if (port=='DEMO'):
+            self.demo_mode=True
+            print("Demo mode: No hardware connections")
+        else:
+            self.demo_mode=False
         self.port = port
         self.baudrate = baudrate
-        self.ser = serial.Serial(self.port, self.baudrate, timeout=1)
-        time.sleep(2)
+        if not self.demo_mode:
+            self.ser = serial.Serial(self.port, self.baudrate, timeout=1)
+            time.sleep(1)
         
     def __del__(self):
         self.ser.close()
@@ -59,21 +65,23 @@ class SerialConnector(QObject):
         :param data: Dataen der skal sendes (kan være en hvilken som helst datatype, 
                      men vil blive konverteret til JSON).
         """
-        try:
-            # Konverter data til JSON (hvis muligt)
-            json_data = json.dumps(data)
-            # Åbn serielporten og send data
-            with serial.Serial(self.port, self.baudrate, timeout=1) as ser:
-                ser.write(json_data.encode('utf-8'))
-                ser.write("\n".encode('utf-8'))
-        except (serial.SerialException, json.JSONDecodeError) as e:
-            print(f"Fejl ved sending af data: {e}")
+        if not self.demo_mode:
+            try:
+                # Konverter data til JSON (hvis muligt)
+                json_data = json.dumps(data)
+                # Åbn serielporten og send data
+                with serial.Serial(self.port, self.baudrate, timeout=1) as ser:
+                    ser.write(json_data.encode('utf-8'))
+                    ser.write("\n".encode('utf-8'))
+            except (serial.SerialException, json.JSONDecodeError) as e:
+                print(f"Fejl ved sending af data: {e}")
         
     def get_data(self):
-        try:
-            # Åbn serielporten og hent data
-            with serial.Serial(self.port, self.baudrate, timeout=1) as ser:
-                response=ser.readline()
-                return response.decode('utf-8').strip()
-        except (serial.SerialException, json.JSONDecodeError) as e:
-            print(f"Fejl ved sending af data: {e}")
+        if not self.demo_mode:
+            try:
+                # Åbn serielporten og hent data
+                with serial.Serial(self.port, self.baudrate, timeout=1) as ser:
+                    response=ser.readline()
+                    return response.decode('utf-8').strip()
+            except (serial.SerialException, json.JSONDecodeError) as e:
+                print(f"Fejl ved sending af data: {e}")

@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushButton, QLineEdit, QSlider, QDialog, QGroupBox
+import ChangeSetpointDialog, SettingsDialog
 
 class TermoData():
     def __init__(self):
@@ -28,6 +29,7 @@ class TermostatWidget(QWidget):
 
     def __init__(self, title):
         super().__init__()
+        self.title = title
         
         self.on_button = QPushButton("On", self)
         self.on_button.setCheckable(True) # setting checkable to true
@@ -51,7 +53,10 @@ class TermostatWidget(QWidget):
         self.statustext.setAlignment(Qt.AlignCenter)
         self.statustext.setStyleSheet("font-size: 20px;background-color: yellow")
         self.statustext.setEnabled(True)
-
+        
+        self.setpoint_button = QPushButton("Ret Setpoint", self)
+        self.setpoint_button.clicked.connect(self.open_setpoint_dialog) # setting calling method by button
+ 
         # Opretter en gruppe til formområdet
         self.group_box = QGroupBox(title)
 
@@ -62,10 +67,16 @@ class TermostatWidget(QWidget):
         layout.addWidget(self.temp_label,2,0)
         layout.addWidget(self.sp_label,3,0)
         layout.addWidget(self.statustext,4,0)
+        layout.addWidget(self.setpoint_button,5,0)
         self.group_box.setLayout(layout)
 
         # Forbinder signalet til slotten
         self.temperature_updated.connect(self.update_temperature)
+        
+    def open_setpoint_dialog(self):
+        # Åbner det nye vindue
+        self.ChangeSetpointDialog = ChangeSetpointDialog.ChangeSetpointDialog(self.title, 50)
+        self.ChangeSetpointDialog.show()
         
     def changeState(self):
         if self.on_button.isChecked(): # if button is checked

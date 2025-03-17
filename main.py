@@ -13,7 +13,7 @@ import SerialConnector as SD, SignalData
 class TemperatureApp(QWidget):
     def __init__(self, serialConnector):
         super().__init__()
-        self.sd=SD.SerialConnector('/dev/ttyACM0')
+        self.serialConnector = serialConnector
         self.setpoint1=0
         self.setpoint2=0
         self.setpoint3=0
@@ -22,10 +22,11 @@ class TemperatureApp(QWidget):
         self.initUI()
 
         # Opret en timer
-        timer = QTimer(self, interval=3000, timeout=self.update_temperature)
-        timer.start()
+        if (not self.serialConnector.demo_mode):
+            timer = QTimer(self, interval=3000, timeout=self.update_temperature)
+            timer.start()
 
-        serialConnector.new_data_signal.connect(self.update_temperature)
+        self.serialConnector.new_data_signal.connect(self.update_temperature)
         
     def initUI(self):
         super().__init__()
@@ -46,9 +47,9 @@ class TemperatureApp(QWidget):
         main_layout.addWidget(self.termostat1.get_widget(), 1, 0)
         main_layout.addWidget(self.termostat2.get_widget(), 1, 1)
         main_layout.addWidget(self.termostat3.get_widget(), 1, 2)
-        main_layout.addWidget(self.buttons.get_widget(), 1, 3)
-        main_layout.addWidget(self.relays, 2, 0, 1, 4)
-        main_layout.addWidget(self.watch, 3, 0, 1, 4)
+        main_layout.addWidget(self.relays, 1, 3)
+        main_layout.addWidget(self.watch, 2, 0, 1, 3)
+        main_layout.addWidget(self.buttons.get_widget(), 2, 3)
 
         self.setLayout(main_layout)
         # Sæt vinduets titel og størrelse
@@ -56,11 +57,11 @@ class TemperatureApp(QWidget):
         self.setGeometry(100, 100, 800, 400)
     
     def set_relay_1(self, value):
-        data=SignalData.SignalData(self.sd.set_relay_1(value))
+        data=SignalData.SignalData(self.serialConnector.set_relay_1(value))
         print(data)
 
     def update_temperature(self): #, data):
-        data=SignalData.SignalData(self.sd.get_temperature())
+        data=SignalData.SignalData(self.serialConnector.get_temperature())
         # Opdater GUI'en med den modtagne temperatur
         self.termostat1.temperature_updated.emit(data.termostatData1.temperatur,data.termostatData1.setpoint)
         self.termostat2.temperature_updated.emit(data.termostatData2.temperatur,data.termostatData2.setpoint)
@@ -69,7 +70,8 @@ class TemperatureApp(QWidget):
 # Hovedfunktion
 def main():
     app = QApplication(sys.argv)
-    serialConnector = SD.SerialConnector('/dev/ttyACM0')
+    #serialConnector = SD.SerialConnector('/dev/ttyACM0')
+    serialConnector = SD.SerialConnector('DEMO')
 
     window = TemperatureApp(serialConnector)
     window.show()
