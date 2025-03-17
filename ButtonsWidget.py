@@ -1,14 +1,17 @@
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QSize
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushButton, QLineEdit, QSlider, QDialog, QGroupBox
+from PyQt5.QtGui import QIcon
 import SettingsDialog
 
 class ButtonsWidget(QWidget):
     def __init__(self, title):
         super().__init__()
  
-        self.settings_button = QPushButton('Settings', self)
+        self.settings_button = QPushButton('', self)
         self.settings_button.clicked.connect(self.open_setting_dialog)
-        self.settings_button.setFixedSize(100,50)
+        self.settings_button.setIcon(QIcon('settings-icon.jpg'))
+        self.settings_button.setIconSize(QSize(90, 90))
+        self.settings_button.setFixedSize(100,100)
 
         # Opretter en gruppe til formområdet
         self.group_box = QGroupBox(title)
