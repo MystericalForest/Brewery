@@ -16,7 +16,7 @@ class ChangeSetpointDialog(QDialog):
         # Layout og inputfelter
         layout = QGridLayout()
         
-        # Slider 1
+        # Slider
         self.label = QLabel("Setpoint for " + name, self)
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setStyleSheet("font-size: 30px;")
@@ -52,4 +52,4 @@ class ChangeSetpointDialog(QDialog):
         self.accept()  # Lukker dialogen efter overførsel
 
     def cancel_clicked(self):
-        pass
+        self.reject()
