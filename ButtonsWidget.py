@@ -25,6 +25,8 @@ class ButtonsWidget(QWidget):
         # Åbner det nye vindue
         self.SettingsDialog = SettingsDialog.SettingsDialog()
         self.SettingsDialog.show()
+#        if self.SettingsDialog.exec_()  == QDialog.Accepted:
+#            print("Settings Accepted")
 
     def get_widget(self):
         return self.group_box

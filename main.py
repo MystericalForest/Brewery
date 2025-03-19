@@ -1,6 +1,6 @@
 import sys
 import json
-from PyQt5.QtCore import QTimer, Qt, QThread, pyqtSignal
+from PyQt5.QtCore import QTimer, Qt, QThread, pyqtSignal, QSettings
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushButton, QLineEdit, QSlider, QDialog
 import SignalData as SD
 import ChangeSetpointDialog
@@ -13,7 +13,9 @@ import SerialConnector as SD, SignalData
 class TemperatureApp(QWidget):
     def __init__(self, serialConnector):
         super().__init__()
+        self.settings = QSettings("VestervangBryglaug", "BrewControl")
         self.serialConnector = serialConnector
+        self.load_settings()
         self.setpoint1=0
         self.setpoint2=0
         self.setpoint3=0
@@ -33,9 +35,9 @@ class TemperatureApp(QWidget):
 
         # Initialiserer de forskellige widgets
         self.header = HW.HeaderWidget()
-        self.termostat1 = TW.TermostatWidget("Spargevand")
-        self.termostat2 = TW.TermostatWidget("Mæskegryde")
-        self.termostat3 = TW.TermostatWidget("Kogegryde")
+        self.termostat1 = TW.TermostatWidget(self.termo_1_name)
+        self.termostat2 = TW.TermostatWidget(self.termo_2_name)
+        self.termostat3 = TW.TermostatWidget(self.termo_3_name)
         self.buttons = BW.ButtonsWidget("Control")
         self.relays = RW.RelayWidget(self,"Pumpe", "Lys", "Støvsuger", "Kran")
         self.watch = WW.WatchWidget("Mæsketid", "Kogetid", "Pause")
@@ -55,6 +57,16 @@ class TemperatureApp(QWidget):
         # Sæt vinduets titel og størrelse
         self.setWindowTitle('Brew Control')
         self.setGeometry(100, 100, 800, 400)
+
+    def load_settings(self):
+        self.port = self.settings.value("port", "")
+        self.termo_1_name = self.settings.value("termo_1_name", "")
+        self.termo_2_name = self.settings.value("termo_2_name", "")
+        self.termo_3_name = self.settings.value("termo_3_name", "")
+        self.watch_1_name = self.settings.value("watch_1_name", "")
+        self.watch_2_name = self.settings.value("watch_2_name", "")
+        self.watch_3_name = self.settings.value("watch_3_name", "")
+        self.demo_mode = self.settings.value("demo_mode", False, type=bool)
     
     def set_relay_1(self, value):
         data=SignalData.SignalData(self.serialConnector.set_relay_1(value))

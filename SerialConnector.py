@@ -23,7 +23,8 @@ class SerialConnector(QObject):
             time.sleep(1)
         
     def __del__(self):
-        self.ser.close()
+        if not self.demo_mode:
+            self.ser.close()
         
     def set_led(self, value):
         data ={'action':"set_led",
