@@ -9,13 +9,11 @@ class SerialConnector(QObject):
     # Signal til at sende data tilbage til GUI'en
     new_data_signal = pyqtSignal(SD.SignalData)
     
-    def __init__(self, port, baudrate=9600):
+    def __init__(self, port, demo_mode=False, baudrate=9600):
         super().__init__()
-        if (port=='DEMO'):
-            self.demo_mode=True
+        self.demo_mode=demo_mode
+        if (self.demo_mode):
             print("Demo mode: No hardware connections")
-        else:
-            self.demo_mode=False
         self.port = port
         self.baudrate = baudrate
         if not self.demo_mode:

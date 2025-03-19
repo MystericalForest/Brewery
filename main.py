@@ -11,11 +11,13 @@ import SerialConnector as SD, SignalData
 
 # GUI Klasse
 class TemperatureApp(QWidget):
-    def __init__(self, serialConnector):
+    def __init__(self):
         super().__init__()
         self.settings = QSettings("VestervangBryglaug", "BrewControl")
-        self.serialConnector = serialConnector
         self.load_settings()
+        #self.serialConnector = SD.SerialConnector('/dev/ttyACM0')
+        self.serialConnector = SD.SerialConnector(self.port, demo_mode=self.demo_mode, baudrate=9600)
+#        self.serialConnector = serialConnector
         self.setpoint1=0
         self.setpoint2=0
         self.setpoint3=0
@@ -40,7 +42,7 @@ class TemperatureApp(QWidget):
         self.termostat3 = TW.TermostatWidget(self.termo_3_name)
         self.buttons = BW.ButtonsWidget("Control")
         self.relays = RW.RelayWidget(self,"Pumpe", "Lys", "Støvsuger", "Kran")
-        self.watch = WW.WatchWidget("Mæsketid", "Kogetid", "Pause")
+        self.watch = WW.WatchWidget(self.watch_1_name, self.watch_2_name, self.watch_3_name)
         self.watch.set_time(1000, 5000, 10000)
 
         # Opretter et overordnet layout og tilføjer widgets til det
@@ -59,13 +61,13 @@ class TemperatureApp(QWidget):
         self.setGeometry(100, 100, 800, 400)
 
     def load_settings(self):
-        self.port = self.settings.value("port", "")
-        self.termo_1_name = self.settings.value("termo_1_name", "")
-        self.termo_2_name = self.settings.value("termo_2_name", "")
-        self.termo_3_name = self.settings.value("termo_3_name", "")
-        self.watch_1_name = self.settings.value("watch_1_name", "")
-        self.watch_2_name = self.settings.value("watch_2_name", "")
-        self.watch_3_name = self.settings.value("watch_3_name", "")
+        self.port = self.settings.value("port", "/dev/ttyACM0")
+        self.termo_1_name = self.settings.value("termo_1_name", "Spargevand")
+        self.termo_2_name = self.settings.value("termo_2_name", "Mæskegryde")
+        self.termo_3_name = self.settings.value("termo_3_name", "Kogegryde")
+        self.watch_1_name = self.settings.value("watch_1_name", "Mæsketid")
+        self.watch_2_name = self.settings.value("watch_2_name", "Kogetid")
+        self.watch_3_name = self.settings.value("watch_3_name", "Pause")
         self.demo_mode = self.settings.value("demo_mode", False, type=bool)
     
     def set_relay_1(self, value):
@@ -82,10 +84,8 @@ class TemperatureApp(QWidget):
 # Hovedfunktion
 def main():
     app = QApplication(sys.argv)
-    #serialConnector = SD.SerialConnector('/dev/ttyACM0')
-    serialConnector = SD.SerialConnector('DEMO')
 
-    window = TemperatureApp(serialConnector)
+    window = TemperatureApp()
     window.show()
 
     sys.exit(app.exec_())
