@@ -19,6 +19,7 @@ class SerialConnector(QObject):
         if not self.demo_mode:
             self.ser = serial.Serial(self.port, self.baudrate, timeout=1)
             time.sleep(1)
+            self.get_data()
         
     def __del__(self):
         if not self.demo_mode:
@@ -28,6 +29,7 @@ class SerialConnector(QObject):
         data ={'action':"set_led",
                'value':value}
         self.send_data(data)
+        return self.get_data()
         
     def get_temperature(self, termostat=4):
         data ={'action':"get_temperature",
@@ -42,21 +44,25 @@ class SerialConnector(QObject):
         data ={'action':"set_led",
                'value':value}
         self.send_data(data)
+        return self.get_data()
         
     def set_setpoint1(self, temperatur):
         data ={'action':"setpoint_1",
                'value':temperatur}
         self.send_data(data)
+        return self.get_data()
         
     def set_setpoint2(self, temperatur):
         data ={'action':"setpoint_2",
                'value':temperatur}
         self.send_data(data)
+        return self.get_data()
         
     def set_setpoint3(self, temperatur):
         data ={'action':"setpoint_3",
                'value':temperatur}
         self.send_data(data)
+        return self.get_data()
         
     def send_data(self, data):
         """
@@ -68,19 +74,32 @@ class SerialConnector(QObject):
             try:
                 # Konverter data til JSON (hvis muligt)
                 json_data = json.dumps(data)
-                # Åbn serielporten og send data
-                with serial.Serial(self.port, self.baudrate, timeout=1) as ser:
-                    ser.write(json_data.encode('utf-8'))
-                    ser.write("\n".encode('utf-8'))
+
+                self.ser.write(json_data.encode('utf-8'))
+                self.ser.write("\n".encode('utf-8'))
             except (serial.SerialException, json.JSONDecodeError) as e:
                 print(f"Fejl ved sending af data: {e}")
         
     def get_data(self):
         if not self.demo_mode:
             try:
-                # Åbn serielporten og hent data
-                with serial.Serial(self.port, self.baudrate, timeout=1) as ser:
-                    response=ser.readline()
-                    return response.decode('utf-8').strip()
+                response=self.ser.readline()
+                return response.decode('utf-8').strip()
             except (serial.SerialException, json.JSONDecodeError) as e:
                 print(f"Fejl ved sending af data: {e}")
+
+# Hovedfunktion
+def main():
+    app = QApplication(sys.argv)
+
+    window = TemperatureApp()
+    window.show()
+
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    ser=SerialConnector("/dev/ttyACM0", demo_mode=False, baudrate=9600)
+    print(ser.set_led(1))
+    time.sleep(1)
+    print(ser.set_led(0))
+    print(ser.get_temperature())

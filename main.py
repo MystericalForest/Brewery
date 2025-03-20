@@ -26,11 +26,11 @@ class TemperatureApp(QWidget):
         self.initUI()
 
         # Opret en timer
-        if (not self.serialConnector.demo_mode):
+        if (not self.demo_mode):
             timer = QTimer(self, interval=3000, timeout=self.update_temperature)
             timer.start()
 
-        self.serialConnector.new_data_signal.connect(self.update_temperature)
+#        self.serialConnector.new_data_signal.connect(self.update_temperature)
         
     def initUI(self):
         super().__init__()
