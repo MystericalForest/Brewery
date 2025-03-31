@@ -37,11 +37,11 @@ class TemperatureApp(QWidget):
 
         # Initialiserer de forskellige widgets
         self.header = HW.HeaderWidget()
-        self.termostat1 = TW.TermostatWidget(self.termo_1_name)
-        self.termostat2 = TW.TermostatWidget(self.termo_2_name)
-        self.termostat3 = TW.TermostatWidget(self.termo_3_name)
+        self.termostat1 = TW.TermostatWidget(self.termo_1_name, self.termo_1_sensor)
+        self.termostat2 = TW.TermostatWidget(self.termo_2_name, self.termo_2_sensor)
+        self.termostat3 = TW.TermostatWidget(self.termo_3_name, self.termo_3_sensor)
         self.buttons = BW.ButtonsWidget("Control")
-        self.relays = RW.RelayWidget(self,"Pumpe", "Lys", "Støvsuger", "Kran")
+        self.relays = RW.RelayWidget(self, "Pumpe", "Lys", "Støvsuger", "Kran")
         self.watch = WW.WatchWidget(self.watch_1_name, self.watch_2_name, self.watch_3_name)
         self.watch.set_time(1000, 5000, 10000)
 
@@ -63,8 +63,11 @@ class TemperatureApp(QWidget):
     def load_settings(self):
         self.port = self.settings.value("port", "/dev/ttyACM0")
         self.termo_1_name = self.settings.value("termo_1_name", "Spargevand")
+        self.termo_1_sensor = self.settings.value("termo_1_sensor", 0)
         self.termo_2_name = self.settings.value("termo_2_name", "Mæskegryde")
+        self.termo_2_sensor = self.settings.value("termo_2_sensor", 0)
         self.termo_3_name = self.settings.value("termo_3_name", "Kogegryde")
+        self.termo_3_sensor = self.settings.value("termo_3_sensor", 0)
         self.watch_1_name = self.settings.value("watch_1_name", "Mæsketid")
         self.watch_2_name = self.settings.value("watch_2_name", "Kogetid")
         self.watch_3_name = self.settings.value("watch_3_name", "Pause")
