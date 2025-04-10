@@ -9,7 +9,7 @@ class SerialConnector(QObject):
     # Signal til at sende data tilbage til GUI'en
     new_data_signal = pyqtSignal(SD.SignalData)
     
-    def __init__(self, port, demo_mode=False, baudrate=9600):
+    def __init__(self, port, demo_mode=False, baudrate=115200):
         super().__init__()
         self.demo_mode=demo_mode
         if (self.demo_mode):
@@ -35,14 +35,14 @@ class SerialConnector(QObject):
         data ={'action':"get_temperature",
                'value':termostat}
         self.send_data(data)
-        json_data = json.loads(self.get_data())
-        response = SD.SignalData(json_data)
-        self.new_data_signal.emit(response)
-        return json_data
+ #       json_data = json.loads(self.get_data())
+ #       response = SD.SignalData(json_data)
+ #       self.new_data_signal.emit(response)
+        return #json_data
         
-    def set_relay_1(self, value):
-        data ={'action':"set_led",
-               'value':value}
+    def set_relay(self, relay, value):
+        data ={'relay':relay,
+               'state':value}
         self.send_data(data)
         return self.get_data()
         
@@ -98,8 +98,12 @@ def main():
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    ser=SerialConnector("/dev/ttyACM0", demo_mode=False, baudrate=9600)
-    print(ser.set_led(1))
+    ser=SerialConnector("/dev/ttyACM0", demo_mode=False, baudrate=115200)
+    for i in range(4):
+        print(ser.set_relay(i, True))
+        time.sleep(0.3)
+    for i in range(4):
+        print(ser.set_relay(3-i, False))
+        time.sleep(0.3)
     time.sleep(1)
-    print(ser.set_led(0))
     print(ser.get_temperature())
