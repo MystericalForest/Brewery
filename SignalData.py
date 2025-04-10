@@ -1,5 +1,18 @@
 import json
 
+class SignalDataRelays():
+    def __init__(self):
+        self.relay_1=False
+        self.relay_2=False
+        self.relay_3=False
+        self.relay_4=False
+
+    def receive_json(self, json_data):
+        self.relay_1=json_data[0]
+        self.relay_2=json_data[1]
+        self.relay_3=json_data[2]
+        self.relay_4=json_data[3]
+
 class SignalDataTermostat():
     def __init__(self):
         self.temperatur=0
@@ -26,11 +39,15 @@ class SignalData():
         self.termostatData1=SignalDataTermostat()
         self.termostatData2=SignalDataTermostat()
         self.termostatData3=SignalDataTermostat()
+        self.relays=SignalDataRelays()
         self.receive_json(json_data)
         
     def receive_json(self, json_data):
         self.data_updated=False
         if (json_data is not None):
+            if "relays" in json_data:
+                self.relays.receive_json(json_data['relays'])
+                self.data_updated=True
             if "Termostat1" in json_data:
                 self.termostatData1.receive_json(json_data['Termostat1'])
                 self.data_updated=True

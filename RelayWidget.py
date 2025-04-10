@@ -67,11 +67,11 @@ class RelayWidget(QWidget):
         if self.relay_1_button.isChecked(): # if button is checked
             self.relay_1_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
             self.relay_1_button.setText("On")
-            self.parent.set_relay_1(True)
+            self.parent.set_relay(0, True)
         else: # if it is unchecked
             self.relay_1_button.setStyleSheet("background-color : lightgrey") # set background color back to light-grey
             self.relay_1_button.setText("Off")
-            self.parent.set_relay_1(False)
+            self.parent.set_relay(0, False)
     
     def relay_2_changeState(self):
         if self.relay_2_button.isChecked(): # if button is checked

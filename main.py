@@ -16,7 +16,7 @@ class TemperatureApp(QWidget):
         self.settings = QSettings("VestervangBryglaug", "BrewControl")
         self.load_settings()
         #self.serialConnector = SD.SerialConnector('/dev/ttyACM0')
-        self.serialConnector = SD.SerialConnector(self.port, demo_mode=self.demo_mode, baudrate=9600)
+        self.serialConnector = SD.SerialConnector(self.port, demo_mode=self.demo_mode, baudrate=115200)
 #        self.serialConnector = serialConnector
         self.setpoint1=0
         self.setpoint2=0
@@ -73,8 +73,8 @@ class TemperatureApp(QWidget):
         self.watch_3_name = self.settings.value("watch_3_name", "Pause")
         self.demo_mode = self.settings.value("demo_mode", False, type=bool)
     
-    def set_relay_1(self, value):
-        data=SignalData.SignalData(self.serialConnector.set_relay_1(value))
+    def set_relay(self, relay, value):
+        data=SignalData.SignalData(self.serialConnector.set_relay(relay, value))
         print(data)
 
     def update_temperature(self): #, data):
