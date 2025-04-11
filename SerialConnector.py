@@ -46,6 +46,18 @@ class SerialConnector(QObject):
         self.send_data(data)
         return self.get_data()
         
+    def set_enabled(self, termostat, value):
+        data ={'thermostat':termostat,
+               'enabled':value}
+        self.send_data(data)
+        return self.get_data()
+        
+    def set_power(self, termostat, value):
+        data ={'thermostat':termostat,
+               'power':value}
+        self.send_data(data)
+        return self.get_data()
+        
     def set_setpoint1(self, temperatur):
         data ={'action':"setpoint_1",
                'value':temperatur}
@@ -61,6 +73,11 @@ class SerialConnector(QObject):
     def set_setpoint3(self, temperatur):
         data ={'action':"setpoint_3",
                'value':temperatur}
+        self.send_data(data)
+        return self.get_data()
+        
+    def request_data(self):
+        data ={'status': True}
         self.send_data(data)
         return self.get_data()
         
@@ -99,11 +116,14 @@ def main():
 
 if __name__ == '__main__':
     ser=SerialConnector("/dev/ttyACM0", demo_mode=False, baudrate=115200)
-    for i in range(4):
-        print(ser.set_relay(i, True))
-        time.sleep(0.3)
-    for i in range(4):
-        print(ser.set_relay(3-i, False))
-        time.sleep(0.3)
-    time.sleep(1)
-    print(ser.get_temperature())
+#    for i in range(4):
+#        print(ser.set_relay(i, True))
+#        time.sleep(0.3)
+#    for i in range(4):
+#        print(ser.set_relay(3-i, False))
+#        time.sleep(0.3)
+#    time.sleep(1)
+    print(ser.set_power(1, 20))
+    print(ser.set_enabled(0, True))
+    print(ser.set_enabled(0, False))
+ #   print(ser.get_temperature())

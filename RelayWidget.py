@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushButton, QLineEdit, QSlider, QDialog, QGroupBox
-import ChangeSetpointDialog
+import ChangeSetpointDialog, SignalData as SD
 
 class RelayWidget(QWidget):
     def __init__(self, parent, Relay_1_Name, Relay_2_Name, Relay_3_Name, Relay_4_Name):
@@ -63,6 +63,40 @@ class RelayWidget(QWidget):
         layout.addWidget(self.relay_4_button, 3, 1)
         self.setLayout(layout)
     
+    def update_state(self, data):
+        signalDataRelays = data.relays;
+        if (signalDataRelays.relay_1==True):
+            self.relay_1_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
+            self.relay_1_button.setText("On")
+        else: # if it is unchecked
+            self.relay_1_button.setStyleSheet("background-color : lightgrey") # set background color back to light-grey
+            self.relay_1_button.setText("Off")
+        self.relay_1_button.setChecked(signalDataRelays.relay_1)
+        
+        if (signalDataRelays.relay_2==True):
+            self.relay_2_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
+            self.relay_2_button.setText("On")
+        else: # if it is unchecked
+            self.relay_2_button.setStyleSheet("background-color : lightgrey") # set background color back to light-grey
+            self.relay_2_button.setText("Off")
+        self.relay_2_button.setChecked(signalDataRelays.relay_2)
+        
+        if (signalDataRelays.relay_2==True):
+            self.relay_3_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
+            self.relay_3_button.setText("On")
+        else: # if it is unchecked
+            self.relay_3_button.setStyleSheet("background-color : lightgrey") # set background color back to light-grey
+            self.relay_3_button.setText("Off")
+        self.relay_3_button.setChecked(signalDataRelays.relay_3)
+        
+        if (signalDataRelays.relay_4==True):
+            self.relay_4_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
+            self.relay_4_button.setText("On")
+        else: # if it is unchecked
+            self.relay_4_button.setStyleSheet("background-color : lightgrey") # set background color back to light-grey
+            self.relay_4_button.setText("Off")
+        self.relay_4_button.setChecked(signalDataRelays.relay_4)
+            
     def relay_1_changeState(self):
         if self.relay_1_button.isChecked(): # if button is checked
             self.relay_1_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
@@ -77,25 +111,31 @@ class RelayWidget(QWidget):
         if self.relay_2_button.isChecked(): # if button is checked
             self.relay_2_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
             self.relay_2_button.setText("On")
+            self.parent.set_relay(1, True)
         else: # if it is unchecked
             self.relay_2_button.setStyleSheet("background-color : lightgrey") # set background color back to light-grey
             self.relay_2_button.setText("Off")
+            self.parent.set_relay(1, False)
     
     def relay_3_changeState(self):
         if self.relay_3_button.isChecked(): # if button is checked
             self.relay_3_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
             self.relay_3_button.setText("On")
+            self.parent.set_relay(2, True)
         else: # if it is unchecked
             self.relay_3_button.setStyleSheet("background-color : lightgrey") # set background color back to light-grey
             self.relay_3_button.setText("Off")
+            self.parent.set_relay(2, False)
     
     def relay_4_changeState(self):
         if self.relay_4_button.isChecked(): # if button is checked
             self.relay_4_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
             self.relay_4_button.setText("On")
+            self.parent.set_relay(3, True)
         else: # if it is unchecked
             self.relay_4_button.setStyleSheet("background-color : lightgrey") # set background color back to light-grey
             self.relay_4_button.setText("Off")
+            self.parent.set_relay(3, False)
 
     def get_widget(self):
         return self

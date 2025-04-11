@@ -112,11 +112,11 @@ class SettingsDialog(QWidget):
     def load_settings(self):
         self.port_input.setText(self.settings.value("port", ""))
         self.termo_1_name_input.setText(self.settings.value("termo_1_name", ""))
-        self.termo_1_sensor_combo.setCurrentIndex(self.settings.value("termo_1_sensor", 0))
+        self.termo_1_sensor_combo.setCurrentIndex(int(self.settings.value("termo_1_sensor", 0)))
         self.termo_2_name_input.setText(self.settings.value("termo_2_name", ""))
-        self.termo_2_sensor_combo.setCurrentIndex(self.settings.value("termo_2_sensor", 0))
+        self.termo_2_sensor_combo.setCurrentIndex(int(self.settings.value("termo_2_sensor", 0)))
         self.termo_3_name_input.setText(self.settings.value("termo_3_name", ""))
-        self.termo_3_sensor_combo.setCurrentIndex(self.settings.value("termo_3_sensor", 0))
+        self.termo_3_sensor_combo.setCurrentIndex(int(self.settings.value("termo_3_sensor", 0)))
         self.watch_1_name_input.setText(self.settings.value("watch_1_name", ""))
         self.watch_2_name_input.setText(self.settings.value("watch_2_name", ""))
         self.watch_3_name_input.setText(self.settings.value("watch_3_name", ""))
@@ -135,10 +135,10 @@ class SettingsDialog(QWidget):
         self.settings.setValue("watch_3_name", self.watch_3_name_input.text())
         self.settings.setValue("demo_mode", self.demo_mode_checkbox.isChecked())
         # Håndter OK knap klik
-        print("OK button clicked!")
-        print(f"Port: {self.port_input.text()}")
-        print(f"Demo mode: {self.demo_mode_checkbox.isChecked()}")
-        print(f"Selected option: {'Option 1' if self.radio_button1.isChecked() else 'Option 2' if self.radio_button2.isChecked() else 'None'}")
+#        print("OK button clicked!")
+#        print(f"Port: {self.port_input.text()}")
+#        print(f"Demo mode: {self.demo_mode_checkbox.isChecked()}")
+#        print(f"Selected option: {'Option 1' if self.radio_button1.isChecked() else 'Option 2' if self.radio_button2.isChecked() else 'None'}")
         self.close()  # Luk vinduet efter OK
 
     def on_cancel(self):

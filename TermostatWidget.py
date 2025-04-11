@@ -25,18 +25,20 @@ class TermoDataClass(QObject):
          
 class TermostatWidget(QWidget):
     # Opretter et signal, der sender dataene
-    temperature_updated = pyqtSignal(int, int)  # Temperatur, Setpoint, Heating Status
+#    temperature_updated = pyqtSignal(int, int)  # Temperatur, Setpoint, Heating Status
 
-    def __init__(self, title, sensor_id):
+    def __init__(self, parent, termostat_id, title, sensor_id):
         super().__init__()
         self.title = title
+        self._id = termostat_id
         self.sensor_id = sensor_id
+        self.parent = parent
         
-        self.on_button = QPushButton("On", self)
+        self.on_button = QPushButton("Off", self)
         self.on_button.setCheckable(True) # setting checkable to true
         self.on_button.clicked.connect(self.changeState) # setting calling method by button
-        self.on_button.setStyleSheet("background-color : lightblue") # setting default color of button to light-blue
-        self.on_button.setChecked(True)
+        self.on_button.setStyleSheet("background-color : lightgrey") # setting default color of button to light-blue
+        self.on_button.setChecked(False)
         
         self.header1 = QLabel(title, self)
         self.header1.setAlignment(Qt.AlignCenter)
@@ -87,11 +89,13 @@ class TermostatWidget(QWidget):
         self.group_box.setLayout(layout)
 
         # Forbinder signalet til slotten
-        self.temperature_updated.connect(self.update_temperature)
+ #       self.temperature_updated.connect(self.update_temperature)
 
     def updateLabel(self):
         # Opdaterer labelen med den aktuelle værdi fra drejeknappen
         self.power_label.setText(f"{self.power_dial.value()} %")
+        if self.on_button.isChecked():
+            self.parent.set_power(self._id, self.power_dial.value())
         
     def open_setpoint_dialog(self):
         # Åbner det nye vindue
@@ -103,9 +107,21 @@ class TermostatWidget(QWidget):
         if self.on_button.isChecked(): # if button is checked
             self.on_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
             self.on_button.setText("On")
+            self.parent.set_enabled(self._id, True)
         else: # if it is unchecked
             self.on_button.setStyleSheet("background-color : lightgrey") # set background color back to light-grey
             self.on_button.setText("Off")
+            self.parent.set_enabled(self._id, False)
+            
+    def update_data(self, data):
+        self.temp_label.setText(f"{data.temperatur} °C")
+        self.temp_label.repaint()  # Tvinger en opdatering af labelen
+        self.sp_label.setText(f"(SP: {data.setpoint} °C)")
+        self.sp_label.repaint()  # Tvinger en opdatering af labelen
+#        data.enabled
+        self.power_dial.setValue(data.power)
+#        data.manual
+#        data.heating
  
     def update_temperature(self, temperature, setpoint):
         # Opdater GUI'en med den modtagne temperatur

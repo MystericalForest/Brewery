@@ -15,7 +15,7 @@ class TemperatureApp(QWidget):
         super().__init__()
         self.settings = QSettings("VestervangBryglaug", "BrewControl")
         self.load_settings()
-        #self.serialConnector = SD.SerialConnector('/dev/ttyACM0')
+#        self.serialConnector = SD.SerialConnector("/dev/ttyACM0", demo_mode=False, baudrate=115200)
         self.serialConnector = SD.SerialConnector(self.port, demo_mode=self.demo_mode, baudrate=115200)
 #        self.serialConnector = serialConnector
         self.setpoint1=0
@@ -37,9 +37,9 @@ class TemperatureApp(QWidget):
 
         # Initialiserer de forskellige widgets
         self.header = HW.HeaderWidget()
-        self.termostat1 = TW.TermostatWidget(self.termo_1_name, self.termo_1_sensor)
-        self.termostat2 = TW.TermostatWidget(self.termo_2_name, self.termo_2_sensor)
-        self.termostat3 = TW.TermostatWidget(self.termo_3_name, self.termo_3_sensor)
+        self.termostat1 = TW.TermostatWidget(self, 0, self.termo_1_name, self.termo_1_sensor)
+        self.termostat2 = TW.TermostatWidget(self, 1, self.termo_2_name, self.termo_2_sensor)
+        self.termostat3 = TW.TermostatWidget(self, 2, self.termo_3_name, self.termo_3_sensor)
         self.buttons = BW.ButtonsWidget("Control")
         self.relays = RW.RelayWidget(self, "Pumpe", "Lys", "Støvsuger", "Kran")
         self.watch = WW.WatchWidget(self.watch_1_name, self.watch_2_name, self.watch_3_name)
@@ -61,28 +61,48 @@ class TemperatureApp(QWidget):
         self.setGeometry(100, 100, 800, 400)
 
     def load_settings(self):
-        self.port = self.settings.value("port", "/dev/ttyACM0")
+        self.port = "/dev/ttyACM0" #self.settings.value("port", "/dev/ttyACM0")
         self.termo_1_name = self.settings.value("termo_1_name", "Spargevand")
-        self.termo_1_sensor = self.settings.value("termo_1_sensor", 0)
+        self.termo_1_sensor = int(self.settings.value("termo_1_sensor", 0))
         self.termo_2_name = self.settings.value("termo_2_name", "Mæskegryde")
-        self.termo_2_sensor = self.settings.value("termo_2_sensor", 0)
+        self.termo_2_sensor = int(self.settings.value("termo_2_sensor", 0))
         self.termo_3_name = self.settings.value("termo_3_name", "Kogegryde")
-        self.termo_3_sensor = self.settings.value("termo_3_sensor", 0)
+        self.termo_3_sensor = int(self.settings.value("termo_3_sensor", 0))
         self.watch_1_name = self.settings.value("watch_1_name", "Mæsketid")
         self.watch_2_name = self.settings.value("watch_2_name", "Kogetid")
         self.watch_3_name = self.settings.value("watch_3_name", "Pause")
-        self.demo_mode = self.settings.value("demo_mode", False, type=bool)
+        self.demo_mode = False #self.settings.value("demo_mode", False, type=bool)
     
     def set_relay(self, relay, value):
         data=SignalData.SignalData(self.serialConnector.set_relay(relay, value))
-        print(data)
+        self.update_data(data)
+    
+    def set_enabled(self, termostat_id, value):
+        data=SignalData.SignalData(self.serialConnector.set_enabled(termostat_id, value))
+        self.update_data(data)
+    
+    def set_power(self, termostat_id, value):
+        data=SignalData.SignalData(self.serialConnector.set_power(termostat_id, value))
+        self.update_data(data)
+        
+    def update_data(self, data):
+        self.relays.update_state(data)
+        self.termostat1.update_data(data.termostatData1)
+        self.termostat2.update_data(data.termostatData2)
+        self.termostat3.update_data(data.termostatData3)
 
     def update_temperature(self): #, data):
-        data=SignalData.SignalData(self.serialConnector.get_temperature())
+        data=SignalData.SignalData(self.serialConnector.request_data())
+        self.update_data(data)
+#        data=SignalData.SignalData(self.serialConnector.get_temperature())
         # Opdater GUI'en med den modtagne temperatur
-        self.termostat1.temperature_updated.emit(data.termostatData1.temperatur,data.termostatData1.setpoint)
-        self.termostat2.temperature_updated.emit(data.termostatData2.temperatur,data.termostatData2.setpoint)
-        self.termostat3.temperature_updated.emit(data.termostatData3.temperatur,data.termostatData3.setpoint) 
+#        self.termostat1.temperature_updated.emit(data.termostatData1.temperatur,data.termostatData1.setpoint)
+#        self.termostat2.temperature_updated.emit(data.termostatData2.temperatur,data.termostatData2.setpoint)
+#        self.termostat3.temperature_updated.emit(data.termostatData3.temperatur,data.termostatData3.setpoint)
+    
+#    def parse_json(self, json_data):
+#        data=json.loads(json_data)
+#        print(data["Termostat1"])
 
 # Hovedfunktion
 def main():
