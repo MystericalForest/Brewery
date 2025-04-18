@@ -49,25 +49,25 @@ class SettingsDialog(QWidget):
         self.termo_1_sensor_combo.addItem("PT100 transmitter #1")
         self.termo_1_sensor_combo.addItem("PT100 transmitter #2")
         self.termo_1_sensor_combo.addItem("PT100 transmitter #3")
+        self.termo_1_sensor_combo.addItem("PT100 transmitter #4")
         self.termo_1_sensor_combo.addItem("D18BS20 transmitter #1")
         self.termo_1_sensor_combo.addItem("D18BS20 transmitter #2")
-        self.termo_1_sensor_combo.addItem("D18BS20 transmitter #3")
         
         self.termo_2_sensor_combo.addItem("Manuel")
         self.termo_2_sensor_combo.addItem("PT100 transmitter #1")
         self.termo_2_sensor_combo.addItem("PT100 transmitter #2")
         self.termo_2_sensor_combo.addItem("PT100 transmitter #3")
+        self.termo_2_sensor_combo.addItem("PT100 transmitter #4")
         self.termo_2_sensor_combo.addItem("D18BS20 transmitter #1")
         self.termo_2_sensor_combo.addItem("D18BS20 transmitter #2")
-        self.termo_2_sensor_combo.addItem("D18BS20 transmitter #3")
         
         self.termo_3_sensor_combo.addItem("Manuel")
         self.termo_3_sensor_combo.addItem("PT100 transmitter #1")
         self.termo_3_sensor_combo.addItem("PT100 transmitter #2")
         self.termo_3_sensor_combo.addItem("PT100 transmitter #3")
+        self.termo_3_sensor_combo.addItem("PT100 transmitter #4")
         self.termo_3_sensor_combo.addItem("D18BS20 transmitter #1")
         self.termo_3_sensor_combo.addItem("D18BS20 transmitter #2")
-        self.termo_3_sensor_combo.addItem("D18BS20 transmitter #3")
         
         # Layout
         self.layout = QGridLayout()

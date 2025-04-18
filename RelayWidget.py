@@ -81,7 +81,7 @@ class RelayWidget(QWidget):
             self.relay_2_button.setText("Off")
         self.relay_2_button.setChecked(signalDataRelays.relay_2)
         
-        if (signalDataRelays.relay_2==True):
+        if (signalDataRelays.relay_3==True):
             self.relay_3_button.setStyleSheet("background-color : lightblue") # setting background color to light-blue
             self.relay_3_button.setText("On")
         else: # if it is unchecked

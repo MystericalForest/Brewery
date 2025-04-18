@@ -24,6 +24,9 @@ class TemperatureApp(QWidget):
         self.termoData = TW.TermoDataClass()
 
         self.initUI()
+        self.set_sensor(0, self.termo_1_sensor)
+        self.set_sensor(1, self.termo_2_sensor)
+        self.set_sensor(2, self.termo_3_sensor)
 
         # Opret en timer
         if (not self.demo_mode):
@@ -71,7 +74,7 @@ class TemperatureApp(QWidget):
         self.watch_1_name = self.settings.value("watch_1_name", "Mæsketid")
         self.watch_2_name = self.settings.value("watch_2_name", "Kogetid")
         self.watch_3_name = self.settings.value("watch_3_name", "Pause")
-        self.demo_mode = False #self.settings.value("demo_mode", False, type=bool)
+        self.demo_mode = self.settings.value("demo_mode", False, type=bool)
     
     def set_relay(self, relay, value):
         data=SignalData.SignalData(self.serialConnector.set_relay(relay, value))
@@ -79,6 +82,10 @@ class TemperatureApp(QWidget):
     
     def set_enabled(self, termostat_id, value):
         data=SignalData.SignalData(self.serialConnector.set_enabled(termostat_id, value))
+        self.update_data(data)
+    
+    def set_sensor(self, termostat_id, sensor):
+        data=SignalData.SignalData(self.serialConnector.set_sensor(termostat_id, sensor))
         self.update_data(data)
     
     def set_power(self, termostat_id, value):

@@ -114,7 +114,7 @@ class TermostatWidget(QWidget):
             self.parent.set_enabled(self._id, False)
             
     def update_data(self, data):
-        self.temp_label.setText(f"{data.temperatur} °C")
+        self.temp_label.setText(f"{data.temperatur:.1f} °C")
         self.temp_label.repaint()  # Tvinger en opdatering af labelen
         self.sp_label.setText(f"(SP: {data.setpoint} °C)")
         self.sp_label.repaint()  # Tvinger en opdatering af labelen
@@ -125,7 +125,7 @@ class TermostatWidget(QWidget):
  
     def update_temperature(self, temperature, setpoint):
         # Opdater GUI'en med den modtagne temperatur
-        self.temp_label.setText(f"{temperature} °C")
+        self.temp_label.setText(f"{temperature:.1f} °C")
         self.temp_label.repaint()  # Tvinger en opdatering af labelen
         self.sp_label.setText(f"(SP: {setpoint} °C)")
         self.sp_label.repaint()  # Tvinger en opdatering af labelen

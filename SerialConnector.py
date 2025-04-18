@@ -52,6 +52,13 @@ class SerialConnector(QObject):
         self.send_data(data)
         return self.get_data()
         
+    def set_sensor(self, termostat, sensor):
+        data ={'thermostat':termostat,
+               'sensor':sensor}
+        self.send_data(data)
+        return self.get_data()
+        
+        
     def set_power(self, termostat, value):
         data ={'thermostat':termostat,
                'power':value}
@@ -101,6 +108,9 @@ class SerialConnector(QObject):
         if not self.demo_mode:
             try:
                 response=self.ser.readline()
+                if response == None:
+                    time.sleep(1)
+                    response=self.ser.readline()
                 return response.decode('utf-8').strip()
             except (serial.SerialException, json.JSONDecodeError) as e:
                 print(f"Fejl ved sending af data: {e}")

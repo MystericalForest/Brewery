@@ -26,11 +26,12 @@ class SignalDataTermostat():
         if "Manual" in json_data:
             self.manual=json_data['Manual']
             self.data_updated=True
-        if "temperature" in json_data:
-            self.temperatur=json_data['temperature']
+        if "Temperature" in json_data:
+            self.temperatur=json_data['Temperature']
+            print(self.temperatur)
             self.data_updated=True
-        if "setpoint" in json_data:
-            self.setpoint=json_data['setpoint']
+        if "Setpoint" in json_data:
+            self.setpoint=json_data['Setpoint']
             self.data_updated=True
         if "Heating" in json_data:
             self.heating=json_data['Heating']
@@ -62,17 +63,17 @@ class SignalData():
             if "relays" in data:
                 self.relays.receive_json(data['relays'])
                 self.data_updated=True
-            if "Termostater" in json_data:
-                data = data['Termostater']
-            if "Termostat1" in data:
-                self.termostatData1.receive_json(data['Termostat1'])
-                self.data_updated=True
-            if "Termostat2" in data:
-                self.termostatData2.receive_json(data['Termostat2'])
-                self.data_updated=True
-            if "Termostat3" in data:
-                self.termostatData3.receive_json(data['Termostat3'])
-                self.data_updated=True
+            if "Termostater" in data:
+                termo_data=data['Termostater']
+                if "Termostat1" in termo_data:
+                    self.termostatData1.receive_json(termo_data['Termostat1'])
+                    self.data_updated=True
+                if "Termostat2" in termo_data:
+                    self.termostatData2.receive_json(termo_data['Termostat2'])
+                    self.data_updated=True
+                if "Termostat3" in termo_data:
+                    self.termostatData3.receive_json(termo_data['Termostat3'])
+                    self.data_updated=True
             if "Sensor2" in data:
                 self.temperatur2=data['Sensor2']
                 self.data_updated=True
