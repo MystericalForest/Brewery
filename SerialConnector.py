@@ -17,9 +17,13 @@ class SerialConnector(QObject):
         self.port = port
         self.baudrate = baudrate
         if not self.demo_mode:
-            self.ser = serial.Serial(self.port, self.baudrate, timeout=1)
-            time.sleep(1)
-            self.get_data()
+            try:
+                self.ser = serial.Serial(self.port, self.baudrate, timeout=1)
+                time.sleep(1)
+                self.get_data()
+            except:
+                self.demo_mode=True
+                print("Cannot connect to serial - Demo-mode!")
         
     def __del__(self):
         if not self.demo_mode:
