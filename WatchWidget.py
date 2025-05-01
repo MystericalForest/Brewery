@@ -10,6 +10,8 @@ class TimerDialog(QDialog):
         self.setWindowTitle("Ret tider")
         self.setGeometry(200, 200, 300, 200)
 
+        self.name = name
+
         self.hours = seconds // 3600  # 1 time = 3600 sekunder
         seconds = seconds % 3600  # Resten af sekunderne efter timerne
         self.minutes = seconds // 60  # 1 minut = 60 sekunder
@@ -19,7 +21,7 @@ class TimerDialog(QDialog):
         layout = QGridLayout()
         
         # Slider
-        self.label = QLabel(name, self)
+        self.label = QLabel(self.name, self)
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setStyleSheet("font-size: 24px;")
         
@@ -135,6 +137,10 @@ class Watch(QWidget):
 
     def get_widget(self):
         return self
+
+    def set_name(self, name):
+        self.name = name
+        self.watch_label.setText(self.name)
         
     def start(self):
         self.running = True
@@ -185,6 +191,14 @@ class WatchWidget(QWidget):
 
     def get_widget(self):
         return self
+
+    def set_name(self, watch_id, name):
+        if (watch_id==0):
+            self.watch1.set_name(name)
+        if (watch_id==1):
+            self.watch2.set_name(name)
+        if (watch_id==2):
+            self.watch3.set_name(name)
 
     def set_time(self, second1, second2, second3):
         self.watch1.set_time(second1)

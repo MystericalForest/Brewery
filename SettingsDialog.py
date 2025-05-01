@@ -3,11 +3,12 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QCheckBox, QRadioB
 from PyQt5.QtCore import QSettings
 
 class SettingsDialog(QWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
 
         # Opret QSettings objektet
         self.settings = QSettings("VestervangBryglaug", "BrewControl")
+        self.parent = parent
 
         # Opret UI komponenter
         self.init_ui()
@@ -124,24 +125,37 @@ class SettingsDialog(QWidget):
     
     def on_ok(self):
         self.settings.setValue("port", self.port_input.text())
-        self.settings.setValue("termo_1_name", self.termo_1_name_input.text())
-        self.settings.setValue("termo_1_sensor", self.termo_1_sensor_combo.currentIndex())
-        self.settings.setValue("termo_2_name", self.termo_2_name_input.text())
-        self.settings.setValue("termo_2_sensor", self.termo_2_sensor_combo.currentIndex())
-        self.settings.setValue("termo_3_name", self.termo_3_name_input.text())
-        self.settings.setValue("termo_3_sensor", self.termo_3_sensor_combo.currentIndex())
-        self.settings.setValue("watch_1_name", self.watch_1_name_input.text())
-        self.settings.setValue("watch_2_name", self.watch_2_name_input.text())
-        self.settings.setValue("watch_3_name", self.watch_3_name_input.text())
+        if (self.settings.value("termo_1_name", "") != self.termo_1_name_input.text()):
+            self.settings.setValue("termo_1_name", self.termo_1_name_input.text())
+            self.parent.parent.termostat1.set_title(self.termo_1_name_input.text())
+        if (self.settings.value("termo_1_sensor", "") != self.termo_1_sensor_combo.currentIndex()):
+            self.settings.setValue("termo_1_sensor", self.termo_1_sensor_combo.currentIndex())
+            self.parent.parent.termostat1.set_sensor_id(self.termo_1_sensor_combo.currentIndex())
+        if (self.settings.value("termo_2_name", "") != self.termo_2_name_input.text()):
+            self.settings.setValue("termo_2_name", self.termo_2_name_input.text())
+            self.parent.parent.termostat2.set_title(self.termo_2_name_input.text())
+        if (self.settings.value("termo_2_sensor", "") != self.termo_2_sensor_combo.currentIndex()):
+            self.settings.setValue("termo_2_sensor", self.termo_2_sensor_combo.currentIndex())
+            self.parent.parent.termostat2.set_sensor_id(self.termo_2_sensor_combo.currentIndex())
+        if (self.settings.value("termo_3_name", "") != self.termo_3_name_input.text()):
+            self.settings.setValue("termo_3_name", self.termo_3_name_input.text())
+            self.parent.parent.termostat3.set_title(self.termo_3_name_input.text())
+        if (self.settings.value("termo_3_sensor", "") != self.termo_3_sensor_combo.currentIndex()):
+            self.settings.setValue("termo_3_sensor", self.termo_3_sensor_combo.currentIndex())
+            self.parent.parent.termostat3.set_sensor_id(self.termo_3_sensor_combo.currentIndex())
+        if (self.settings.value("watch_1_name", "") != self.watch_1_name_input.text()):
+            self.settings.setValue("watch_1_name", self.watch_1_name_input.text())
+            self.parent.parent.watch.set_name(0, self.watch_1_name_input.text())
+        if (self.settings.value("watch_2_name", "") != self.watch_2_name_input.text()):
+            self.settings.setValue("watch_2_name", self.watch_2_name_input.text())
+            self.parent.parent.watch.set_name(1, self.watch_2_name_input.text())
+        if (self.settings.value("watch_3_name", "") != self.watch_1_name_input.text()):
+            self.settings.setValue("watch_3_name", self.watch_3_name_input.text())
+            self.parent.parent.watch.set_name(2, self.watch_3_name_input.text())
         self.settings.setValue("demo_mode", self.demo_mode_checkbox.isChecked())
-        # Håndter OK knap klik
-#        print("OK button clicked!")
-#        print(f"Port: {self.port_input.text()}")
-#        print(f"Demo mode: {self.demo_mode_checkbox.isChecked()}")
-#        print(f"Selected option: {'Option 1' if self.radio_button1.isChecked() else 'Option 2' if self.radio_button2.isChecked() else 'None'}")
+
         self.close()  # Luk vinduet efter OK
 
     def on_cancel(self):
         # Håndter Cancel knap klik
-        print("Cancel button clicked!")
         self.close()  # Luk vinduet efter Cancel

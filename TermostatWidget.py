@@ -24,8 +24,6 @@ class TermoDataClass(QObject):
         self.dataChanged.emit(self.data)
          
 class TermostatWidget(QWidget):
-    # Opretter et signal, der sender dataene
-#    temperature_updated = pyqtSignal(int, int)  # Temperatur, Setpoint, Heating Status
 
     def __init__(self, parent, termostat_id, title, sensor_id):
         super().__init__()
@@ -43,7 +41,70 @@ class TermostatWidget(QWidget):
         self.header1 = QLabel(title, self)
         self.header1.setAlignment(Qt.AlignCenter)
         self.header1.setStyleSheet("font-size: 30px;")
+
+        self.create_auto_power()
+        self.create_manual_power()
         
+        self.sensor_label = QLabel(f"Sensor: {self.sensor_id}", self)
+        self.sensor_label.setAlignment(Qt.AlignCenter)
+        self.sensor_label.setStyleSheet("font-size: 24px;")
+ 
+        # Opretter en gruppe til formområdet
+        self.group_box = QGroupBox(title)
+
+        # Opret layout
+        self.layout = QGridLayout()
+        self.layout.addWidget(self.on_button,0,0)
+        self.layout.addWidget(self.header1,1,0)
+        if (self.sensor_id == 0):
+            self.layout.addWidget(self.power_dial, 2, 0)
+            self.layout.addWidget(self.power_label, 3, 0)
+        else:
+            self.layout.addWidget(self.temp_label,2,0)
+            self.layout.addWidget(self.sp_label,3,0)
+            self.layout.addWidget(self.statustext,4,0)
+            self.layout.addWidget(self.setpoint_button,5,0)
+        self.layout.addWidget(self.sensor_label,6,0)
+        self.group_box.setLayout(self.layout)
+
+    def set_title(self, title):
+        self.title = title
+        self.header1.setText(self.title)
+
+    def set_sensor_id(self, sensor_id):
+        if ((self.sensor_id == 0) and (sensor_id != 0)):
+            self.layout.removeWidget(self.power_dial)
+            self.layout.removeWidget(self.power_label)
+            self.power_dial.deleteLater()
+            self.power_label.deleteLater()
+            self.create_auto_power()
+            self.layout.addWidget(self.temp_label,2,0)
+            self.layout.addWidget(self.sp_label,3,0)
+            self.layout.addWidget(self.statustext,4,0)
+            self.layout.addWidget(self.setpoint_button,5,0)
+        if ((self.sensor_id != 0) and (sensor_id == 0)):
+            self.layout.removeWidget(self.temp_label)
+            self.layout.removeWidget(self.sp_label)
+            self.layout.removeWidget(self.statustext)
+            self.layout.removeWidget(self.setpoint_button)
+            self.setpoint_button.deleteLater()
+            self.sp_label.deleteLater()
+            self.statustext.deleteLater()
+            self.temp_label.deleteLater()
+            self.create_manual_power()
+            self.layout.addWidget(self.power_dial, 2, 0)
+            self.layout.addWidget(self.power_label, 3, 0)
+        self.sensor_id = sensor_id
+        self.sensor_label.setText(f"Sensor: {self.sensor_id}")
+        self.parent.set_sensor(self._id, self.sensor_id)
+
+    def updateLabel(self):
+        # Opdaterer labelen med den aktuelle værdi fra drejeknappen
+        self.power_label.setText(f"{self.power_dial.value()} %")
+        if self.on_button.isChecked():
+            self.parent.set_power(self._id, self.power_dial.value())
+
+    def create_auto_power(self):   
         self.temp_label = QLabel("-- °C", self)
         self.temp_label.setAlignment(Qt.AlignCenter)
         self.temp_label.setStyleSheet("font-size: 72px;")
@@ -60,42 +121,17 @@ class TermostatWidget(QWidget):
         self.setpoint_button = QPushButton("Ret Setpoint", self)
         self.setpoint_button.clicked.connect(self.open_setpoint_dialog) # setting calling method by button
         
+    def create_manual_power(self):        
         self.power_dial = QDial(self)
         self.power_dial.setRange(0, 100)
         self.power_dial.setValue(50)
-        
+
         self.power_label = QLabel("50 %", self)
         self.power_label.setAlignment(Qt.AlignCenter)
         self.power_label.setStyleSheet("font-size: 30px;")
 
         # Forbinder signalet til ændring af værdien med en slot (metode)
         self.power_dial.valueChanged.connect(self.updateLabel)
- 
-        # Opretter en gruppe til formområdet
-        self.group_box = QGroupBox(title)
-
-        # Opret layout
-        layout = QGridLayout()
-        layout.addWidget(self.on_button,0,0)
-        layout.addWidget(self.header1,1,0)
-        if (self.sensor_id == 0):
-            layout.addWidget(self.power_dial, 2, 0)
-            layout.addWidget(self.power_label, 3, 0)
-        else:
-            layout.addWidget(self.temp_label,2,0)
-            layout.addWidget(self.sp_label,3,0)
-            layout.addWidget(self.statustext,4,0)
-            layout.addWidget(self.setpoint_button,5,0)
-        self.group_box.setLayout(layout)
-
-        # Forbinder signalet til slotten
- #       self.temperature_updated.connect(self.update_temperature)
-
-    def updateLabel(self):
-        # Opdaterer labelen med den aktuelle værdi fra drejeknappen
-        self.power_label.setText(f"{self.power_dial.value()} %")
-        if self.on_button.isChecked():
-            self.parent.set_power(self._id, self.power_dial.value())
         
     def open_setpoint_dialog(self):
         # Åbner det nye vindue
