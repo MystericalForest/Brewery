@@ -17,7 +17,7 @@ class SignalDataSensor():
     def __init__(self):
         self.sensor_type=""
         self.temperature=-100
-        self.erroflag=False
+        self.errorflag=False
         self.errorDescription=""
         self.humidity=None
 
@@ -25,9 +25,9 @@ class SignalDataSensor():
         if "Type" in json_data:
             self.sensorType=json_data['Type']
         if "Temperature" in json_data:
-            self.temperatur=json_data['Temperature']
+            self.temperature=json_data['Temperature']
         if "ErrorFlag" in json_data:
-            self.erroflag=json_data['ErrorFlag']
+            self.errorflag=json_data['ErrorFlag']
         if "ErrorDescription" in json_data:
             self.errorDescription=json_data['ErrorDescription']
         if "Humidity" in json_data:
@@ -100,29 +100,29 @@ class SignalData():
                 if "Termostat3" in termo_data:
                     self.termostatData3.receive_json(termo_data['Termostat3'])
                     self.data_updated=True
-            if "Sensor" in data:
-                sensor_data=data['Sensor']
-                if "Sensor1" in sensor_data:
-                    self.sensorData1.receive_json(sensor_data['Sensor1'])
-                    self.data_updated=True
-                if "Sensor2" in sensor_data:
-                    self.sensorData2.receive_json(sensor_data['Sensor2'])
-                    self.data_updated=True
-                if "Sensor3" in sensor_data:
-                    self.sensorData3.receive_json(sensor_data['Sensor3'])
-                    self.data_updated=True
-                if "Sensor4" in sensor_data:
-                    self.sensorData4.receive_json(sensor_data['Sensor4'])
-                    self.data_updated=True
-                if "Sensor5" in sensor_data:
-                    self.sensorData5.receive_json(sensor_data['Sensor5'])
-                    self.data_updated=True
-                if "Sensor6" in sensor_data:
-                    self.sensorData6.receive_json(sensor_data['Sensor6'])
-                    self.data_updated=True
-                if "RoomSensor" in sensor_data:
-                    self.sensorData7.receive_json(sensor_data['RoomSensor'])
-                    self.data_updated=True
+                if "Sensor" in termo_data:
+                    sensor_data=termo_data['Sensor']
+                    if "Sensor1" in sensor_data:
+                        self.sensorData1.receive_json(sensor_data['Sensor1'])
+                        self.data_updated=True
+                    if "Sensor2" in sensor_data:
+                        self.sensorData2.receive_json(sensor_data['Sensor2'])
+                        self.data_updated=True
+                    if "Sensor3" in sensor_data:
+                        self.sensorData3.receive_json(sensor_data['Sensor3'])
+                        self.data_updated=True
+                    if "Sensor4" in sensor_data:
+                        self.sensorData4.receive_json(sensor_data['Sensor4'])
+                        self.data_updated=True
+                    if "Sensor5" in sensor_data:
+                        self.sensorData5.receive_json(sensor_data['Sensor5'])
+                        self.data_updated=True
+                    if "Sensor6" in sensor_data:
+                        self.sensorData6.receive_json(sensor_data['Sensor6'])
+                        self.data_updated=True
+                    if "RoomSensor" in sensor_data:
+                        self.sensorData7.receive_json(sensor_data['RoomSensor'])
+                        self.data_updated=True
 ##            if "Sensor2" in data:
 ##                self.temperatur2=data['Sensor2']
 ##                self.data_updated=True

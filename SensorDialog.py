@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QCheckBox, QRadioButton, QComboBox, QGridLayout, QLabel, QPushButton
-from PyQt5.QtCore import Qt, QSettings
+from PyQt5.QtCore import QTimer, Qt, QSettings
 
 class SensorWidget(QWidget):
     def __init__(self, parent, name, sensor_id):
@@ -20,19 +20,19 @@ class SensorWidget(QWidget):
         
         self.sensor_id_label = QLabel(f"Sensor: {self.sensor_id}")
 #        self.sensor_id_label.setAlignment(Qt.AlignCenter)
-        self.sensor_id_label.setStyleSheet("font-size: 18px;")
+        self.sensor_id_label.setStyleSheet("font-size: 18px;background-color: none")
         
         self.sensor_type_label = QLabel(f"Type: {self.sensor_type}")
 #        self.sensor_type_label.setAlignment(Qt.AlignCenter)
-        self.sensor_type_label.setStyleSheet("font-size: 18px;")
+        self.sensor_type_label.setStyleSheet("font-size: 18px;background-color: none")
 
         self.temp_label = QLabel("-- °C", self)
 #        self.temp_label.setAlignment(Qt.AlignCenter)
-        self.temp_label.setStyleSheet("font-size: 72px;")
+        self.temp_label.setStyleSheet("font-size: 72px;background-color: none")
         
         self.error_label = QLabel(f"Error: Ok")
 #        self.error_label.setAlignment(Qt.AlignCenter)
-        self.error_label.setStyleSheet("font-size: 18px;")
+        self.error_label.setStyleSheet("font-size: 18px;background-color: none")
         
         self.graf_button = QPushButton("Graf")
 
@@ -49,9 +49,23 @@ class SensorWidget(QWidget):
         self.setLayout(self.layout)
             
     def update_data(self, data):
-        pass
-#        self.temp_label.setText(f"{data.temperatur:.1f} °C")
-#        self.temp_label.repaint()  # Tvinger en opdatering af labelen
+        self.sensor_type_label.setText(f"Type: {data.sensorType}")
+        if (data.errorflag == True):
+            self.temp_label.setText(f"--- °C")
+            self.temp_label.setStyleSheet("font-size: 72px;background-color: red")
+            self.error_label.setStyleSheet("font-size: 18px;background-color: red")
+            self.sensor_type_label.setStyleSheet("font-size: 18px;background-color: red")
+            self.sensor_id_label.setStyleSheet("font-size: 18px;background-color: red")
+        else:
+            self.temp_label.setText(f"{data.temperature:.1f} °C")
+            self.temp_label.setStyleSheet("font-size: 72px;background-color: none")
+            self.error_label.setStyleSheet("font-size: 18px;background-color: none")
+            self.sensor_type_label.setStyleSheet("font-size: 18px;background-color: none")
+            self.sensor_id_label.setStyleSheet("font-size: 18px;background-color: none")
+        self.error_label.setText(f"Error: {data.errorDescription}")
+        self.sensor_type_label.repaint()
+        self.temp_label.repaint()
+        self.error_label.repaint()
 
     def get_widget(self):
         return self
@@ -66,6 +80,11 @@ class SensorDialog(QWidget):
         self.init_ui()
         
         self.load_settings()
+        
+        # Opret en timer
+        if (not self.parent.parent.demo_mode):
+            timer = QTimer(self, interval=2000, timeout=self.update_data)
+            timer.start()
 
     def init_ui(self):
         # Opret widgets
@@ -86,10 +105,10 @@ class SensorDialog(QWidget):
         # Tilføj widgets til layoutet
         self.layout.addWidget(self.sensor1.get_widget(), 0, 0)
         self.layout.addWidget(self.sensor2.get_widget(), 0, 1)
-        self.layout.addWidget(self.sensor3.get_widget(), 1, 0)
-        self.layout.addWidget(self.sensor4.get_widget(), 1, 1)
-        self.layout.addWidget(self.sensor5.get_widget(), 2, 0)
-        self.layout.addWidget(self.sensor6.get_widget(), 2, 1)
+        self.layout.addWidget(self.sensor3.get_widget(), 0, 2)
+        self.layout.addWidget(self.sensor4.get_widget(), 1, 0)
+        self.layout.addWidget(self.sensor5.get_widget(), 1, 1)
+        self.layout.addWidget(self.sensor6.get_widget(), 1, 2)
         self.layout.addWidget(self.ok_button, 3, 0)
         self.layout.addWidget(self.cancel_button, 3, 1)
         
@@ -105,6 +124,14 @@ class SensorDialog(QWidget):
 
     def load_settings(self):
         pass
+    
+    def update_data(self):
+        self.sensor1.update_data(self.parent.parent.sensorData1.last_datapoint)
+        self.sensor2.update_data(self.parent.parent.sensorData2.last_datapoint)
+        self.sensor3.update_data(self.parent.parent.sensorData3.last_datapoint)
+        self.sensor4.update_data(self.parent.parent.sensorData4.last_datapoint)
+        self.sensor5.update_data(self.parent.parent.sensorData5.last_datapoint)
+        self.sensor6.update_data(self.parent.parent.sensorData6.last_datapoint)
     
     def on_ok(self):
         self.close()  # Luk vinduet efter OK

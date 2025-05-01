@@ -7,7 +7,7 @@ import ChangeSetpointDialog
 import SerialThreat as ST
 import ButtonsWidget as BW, TermostatWidget as TW, HeaderWidget as HW, WatchWidget as WW, RelayWidget as RW
 import random
-import SerialConnector as SD, SignalData
+import SerialConnector as SD, SignalData, SensorData
 
 # GUI Klasse
 class TemperatureApp(QWidget):
@@ -22,6 +22,12 @@ class TemperatureApp(QWidget):
         self.setpoint2=0
         self.setpoint3=0
         self.termoData = TW.TermoDataClass()
+        self.sensorData1 = SensorData.SensorData()
+        self.sensorData2 = SensorData.SensorData()
+        self.sensorData3 = SensorData.SensorData()
+        self.sensorData4 = SensorData.SensorData()
+        self.sensorData5 = SensorData.SensorData()
+        self.sensorData6 = SensorData.SensorData()
 
         self.initUI()
         self.set_sensor(0, self.termo_1_sensor)
@@ -97,6 +103,12 @@ class TemperatureApp(QWidget):
         self.termostat1.update_data(data.termostatData1)
         self.termostat2.update_data(data.termostatData2)
         self.termostat3.update_data(data.termostatData3)
+        self.sensorData1.add_data(data.sensorData1)
+        self.sensorData2.add_data(data.sensorData2)
+        self.sensorData3.add_data(data.sensorData3)
+        self.sensorData4.add_data(data.sensorData4)
+        self.sensorData5.add_data(data.sensorData5)
+        self.sensorData6.add_data(data.sensorData6)
 
     def update_temperature(self): #, data):
         data=SignalData.SignalData(self.serialConnector.request_data())
