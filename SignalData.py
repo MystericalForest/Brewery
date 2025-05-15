@@ -1,4 +1,5 @@
 import json
+from datetime import datetime 
 
 class SignalDataRelays():
     def __init__(self):
@@ -20,6 +21,7 @@ class SignalDataSensor():
         self.errorflag=False
         self.errorDescription=""
         self.humidity=None
+        self.time = datetime.now()
 
     def receive_json(self, json_data):
         if "Type" in json_data:

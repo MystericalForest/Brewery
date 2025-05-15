@@ -94,6 +94,10 @@ class TemperatureApp(QWidget):
         data=SignalData.SignalData(self.serialConnector.set_sensor(termostat_id, sensor))
         self.update_data(data)
     
+    def set_setpoint(self, termostat_id, value):
+        data=SignalData.SignalData(self.serialConnector.set_setpoint(termostat_id, value))
+        self.update_data(data)
+    
     def set_power(self, termostat_id, value):
         data=SignalData.SignalData(self.serialConnector.set_power(termostat_id, value))
         self.update_data(data)

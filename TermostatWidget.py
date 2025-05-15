@@ -138,6 +138,7 @@ class TermostatWidget(QWidget):
         self.ChangeSetpointDialog = ChangeSetpointDialog.ChangeSetpointDialog(self.title, 50)
         if self.ChangeSetpointDialog.exec_()  == QDialog.Accepted:
             self.update_temperature(50,self.ChangeSetpointDialog.slider.value())
+            self.parent.set_setpoint(self._id, self.ChangeSetpointDialog.slider.value())
         
     def changeState(self):
         if self.on_button.isChecked(): # if button is checked

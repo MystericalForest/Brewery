@@ -1,7 +1,37 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QCheckBox, QRadioButton, QComboBox, QGridLayout, QLabel, QPushButton
 from PyQt5.QtCore import QTimer, Qt, QSettings
+# import matplotlib
+# matplotlib.use('Qt5Agg')
+# 
+# from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+# from matplotlib.figure import Figure
 
+# class MplCanvas(FigureCanvasQTAgg):
+# 
+#     def __init__(self, parent=None, width=5, height=4, dpi=100):
+#         fig = Figure(figsize=(width, height), dpi=dpi)
+#         self.axes = fig.add_subplot(111)
+#         super().__init__(fig)
+# 
+# class GraphForm(QWidget):
+#     def __init__(self, parent):
+#         super().__init__()
+#         
+#         self.parent = parent
+# 
+#         # Opret UI komponenter
+#         self.init_ui()
+# 
+#     def init_ui(self):
+#         # Create the maptlotlib FigureCanvas object,
+#         # which defines a single set of axes as self.axes.
+#         sc = MplCanvas(self, width=5, height=4, dpi=100)
+#         sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
+#         self.setCentralWidget(sc)
+# 
+#         self.show()
+        
 class SensorWidget(QWidget):
     def __init__(self, parent, name, sensor_id):
         super().__init__()
@@ -35,6 +65,7 @@ class SensorWidget(QWidget):
         self.error_label.setStyleSheet("font-size: 18px;background-color: none")
         
         self.graf_button = QPushButton("Graf")
+        self.graf_button.clicked.connect(self.show_graph)
 
         # Opret layout
         self.layout = QGridLayout()
@@ -49,7 +80,7 @@ class SensorWidget(QWidget):
         self.setLayout(self.layout)
             
     def update_data(self, data):
-        self.sensor_type_label.setText(f"Type: {data.sensorType}")
+        self.sensor_type_label.setText(f"Type: {data.sensor_type}")
         if (data.errorflag == True):
             self.temp_label.setText(f"--- °C")
             self.temp_label.setStyleSheet("font-size: 72px;background-color: red")
@@ -67,6 +98,12 @@ class SensorWidget(QWidget):
         self.temp_label.repaint()
         self.error_label.repaint()
 
+    def show_graph(self):
+        pass
+#         # Åbner grafen i nyt vindue
+#         self.graphForm = GraphForm(self)
+#         self.graphForm.show()
+    
     def get_widget(self):
         return self
         

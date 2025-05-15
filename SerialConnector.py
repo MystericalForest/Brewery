@@ -62,10 +62,15 @@ class SerialConnector(QObject):
         self.send_data(data)
         return self.get_data()
         
-        
     def set_power(self, termostat, value):
         data ={'thermostat':termostat,
                'power':value}
+        self.send_data(data)
+        return self.get_data()
+        
+    def set_setpoint(self, termostat, value):
+        data ={'thermostat':termostat,
+               'setpoint':value}
         self.send_data(data)
         return self.get_data()
         
