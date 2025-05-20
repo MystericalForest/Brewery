@@ -1,44 +1,47 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QCheckBox, QRadioButton, QComboBox, QGridLayout, QLabel, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLineEdit, QCheckBox, QRadioButton, QComboBox, QGridLayout, QLabel, QPushButton
 from PyQt5.QtCore import QTimer, Qt, QSettings
-# import matplotlib
-# matplotlib.use('Qt5Agg')
-# 
-# from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-# from matplotlib.figure import Figure
+import matplotlib
+matplotlib.use('Qt5Agg')
 
-# class MplCanvas(FigureCanvasQTAgg):
-# 
-#     def __init__(self, parent=None, width=5, height=4, dpi=100):
-#         fig = Figure(figsize=(width, height), dpi=dpi)
-#         self.axes = fig.add_subplot(111)
-#         super().__init__(fig)
-# 
-# class GraphForm(QWidget):
-#     def __init__(self, parent):
-#         super().__init__()
-#         
-#         self.parent = parent
-# 
-#         # Opret UI komponenter
-#         self.init_ui()
-# 
-#     def init_ui(self):
-#         # Create the maptlotlib FigureCanvas object,
-#         # which defines a single set of axes as self.axes.
-#         sc = MplCanvas(self, width=5, height=4, dpi=100)
-#         sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
-#         self.setCentralWidget(sc)
-# 
-#         self.show()
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.figure import Figure
+
+class MplCanvas(FigureCanvasQTAgg):
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        super().__init__(fig)
+
+class GraphForm(QMainWindow): #QWidget):
+    def __init__(self, parent, data):
+        super().__init__()
+        
+        self.parent = parent
+        self.data = data
+
+        # Opret UI komponenter
+        self.init_ui()
+
+    def init_ui(self):
+        # Create the maptlotlib FigureCanvas object,
+        # which defines a single set of axes as self.axes.
+        sc = MplCanvas(self, width=5, height=4, dpi=100)
+        temperature, time = self.data.get_graph_data() #self.parent.parent.parent.parent.sensorData6.get_graph_data()
+        sc.axes.plot(time, temperature)
+        self.setCentralWidget(sc)
+
+        self.show()
         
 class SensorWidget(QWidget):
-    def __init__(self, parent, name, sensor_id):
+    def __init__(self, parent, name, sensor_id, data):
         super().__init__()
         self.parent = parent
         self.sensor_id = sensor_id
         self.sensor_type = "PT100"
         self.name = name
+        self.data = data
 
         self.initUI()
 
@@ -100,9 +103,9 @@ class SensorWidget(QWidget):
 
     def show_graph(self):
         pass
-#         # Åbner grafen i nyt vindue
-#         self.graphForm = GraphForm(self)
-#         self.graphForm.show()
+        # Åbner grafen i nyt vindue
+        self.graphForm = GraphForm(self, self.data)
+        self.graphForm.show()
     
     def get_widget(self):
         return self
@@ -125,12 +128,12 @@ class SensorDialog(QWidget):
 
     def init_ui(self):
         # Opret widgets
-        self.sensor1 = SensorWidget(self, "PT100 transmitter #1", 1)
-        self.sensor2 = SensorWidget(self, "PT100 transmitter #2", 2)
-        self.sensor3 = SensorWidget(self, "PT100 transmitter #3", 3)
-        self.sensor4 = SensorWidget(self, "PT100 transmitter #4", 4)
-        self.sensor5 = SensorWidget(self, "D18BS20 transmitter #1", 5)
-        self.sensor6 = SensorWidget(self, "D18BS20 transmitter #2", 6)
+        self.sensor1 = SensorWidget(self, "PT100 transmitter #1", 1, self.parent.parent.sensorData1)
+        self.sensor2 = SensorWidget(self, "PT100 transmitter #2", 2, self.parent.parent.sensorData2)
+        self.sensor3 = SensorWidget(self, "PT100 transmitter #3", 3, self.parent.parent.sensorData3)
+        self.sensor4 = SensorWidget(self, "PT100 transmitter #4", 4, self.parent.parent.sensorData4)
+        self.sensor5 = SensorWidget(self, "D18BS20 transmitter #1", 5, self.parent.parent.sensorData5)
+        self.sensor6 = SensorWidget(self, "D18BS20 transmitter #2", 6, self.parent.parent.sensorData6)
         
         # OK og Cancel knapper
         self.ok_button = QPushButton("OK")

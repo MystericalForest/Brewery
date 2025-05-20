@@ -50,7 +50,7 @@ class TemperatureApp(QWidget):
         self.termostat2 = TW.TermostatWidget(self, 1, self.termo_2_name, self.termo_2_sensor)
         self.termostat3 = TW.TermostatWidget(self, 2, self.termo_3_name, self.termo_3_sensor)
         self.buttons = BW.ButtonsWidget(self, "Control")
-        self.relays = RW.RelayWidget(self, "Pumpe", "Lys", "Støvsuger", "Kran")
+        self.relays = RW.RelayWidget(self, "Pumpe 1", "Pumpe 2", "Udgang 3", "Udgang 4")
         self.watch = WW.WatchWidget(self.watch_1_name, self.watch_2_name, self.watch_3_name)
         self.watch.set_time(1000, 5000, 10000)
 

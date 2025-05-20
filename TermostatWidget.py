@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushButton, QDial, QLineEdit, QSlider, QDialog, QGroupBox
-import ChangeSetpointDialog, SettingsDialog
+import ChangeSetpointDialog, ChangePowerDialog, SettingsDialog
 
 class TermoData():
     def __init__(self):
@@ -8,6 +8,12 @@ class TermoData():
         self.setpoint=0
         self.heating=False
 
+class ClickableLabel(QLabel):
+    clicked = pyqtSignal()
+    
+    def mousePressEvent(self, event):
+        self.clicked.emit()
+        
 class TermoDataClass(QObject):
     # Signal, der bliver sendt, når dataene ændres
     dataChanged = pyqtSignal(TermoData)
@@ -63,7 +69,7 @@ class TermostatWidget(QWidget):
             self.layout.addWidget(self.temp_label,2,0)
             self.layout.addWidget(self.sp_label,3,0)
             self.layout.addWidget(self.statustext,4,0)
-            self.layout.addWidget(self.setpoint_button,5,0)
+ #           self.layout.addWidget(self.setpoint_button,5,0)
         self.layout.addWidget(self.sensor_label,6,0)
         self.group_box.setLayout(self.layout)
 
@@ -81,13 +87,13 @@ class TermostatWidget(QWidget):
             self.layout.addWidget(self.temp_label,2,0)
             self.layout.addWidget(self.sp_label,3,0)
             self.layout.addWidget(self.statustext,4,0)
-            self.layout.addWidget(self.setpoint_button,5,0)
+#            self.layout.addWidget(self.setpoint_button,5,0)
         if ((self.sensor_id != 0) and (sensor_id == 0)):
             self.layout.removeWidget(self.temp_label)
             self.layout.removeWidget(self.sp_label)
             self.layout.removeWidget(self.statustext)
-            self.layout.removeWidget(self.setpoint_button)
-            self.setpoint_button.deleteLater()
+#            self.layout.removeWidget(self.setpoint_button)
+#            self.setpoint_button.deleteLater()
             self.sp_label.deleteLater()
             self.statustext.deleteLater()
             self.temp_label.deleteLater()
@@ -109,26 +115,28 @@ class TermostatWidget(QWidget):
         self.temp_label.setAlignment(Qt.AlignCenter)
         self.temp_label.setStyleSheet("font-size: 72px;")
         
-        self.sp_label = QLabel("(SP: -- °C)", self)
+        self.sp_label = ClickableLabel("(SP: -- °C)", self)
         self.sp_label.setAlignment(Qt.AlignCenter)
         self.sp_label.setStyleSheet("font-size: 30px;")
+        self.sp_label.clicked.connect(self.open_setpoint_dialog) # setting calling method
         
         self.statustext = QLabel("Varmer", self)
         self.statustext.setAlignment(Qt.AlignCenter)
         self.statustext.setStyleSheet("font-size: 20px;background-color: yellow")
         self.statustext.setEnabled(True)
         
-        self.setpoint_button = QPushButton("Ret Setpoint", self)
-        self.setpoint_button.clicked.connect(self.open_setpoint_dialog) # setting calling method by button
+ #       self.setpoint_button = QPushButton("Ret Setpoint", self)
+ #       self.setpoint_button.clicked.connect(self.open_setpoint_dialog) # setting calling method by button
         
     def create_manual_power(self):        
         self.power_dial = QDial(self)
         self.power_dial.setRange(0, 100)
         self.power_dial.setValue(50)
 
-        self.power_label = QLabel("50 %", self)
+        self.power_label = ClickableLabel("50 %", self)
         self.power_label.setAlignment(Qt.AlignCenter)
         self.power_label.setStyleSheet("font-size: 30px;")
+        self.power_label.clicked.connect(self.open_power_dialog) # setting calling method by button
 
         # Forbinder signalet til ændring af værdien med en slot (metode)
         self.power_dial.valueChanged.connect(self.updateLabel)
@@ -139,6 +147,12 @@ class TermostatWidget(QWidget):
         if self.ChangeSetpointDialog.exec_()  == QDialog.Accepted:
             self.update_temperature(50,self.ChangeSetpointDialog.slider.value())
             self.parent.set_setpoint(self._id, self.ChangeSetpointDialog.slider.value())
+        
+    def open_power_dialog(self):
+        # Åbner det nye vindue
+        self.ChangePowerDialog = ChangePowerDialog.ChangePowerDialog(self.title, 50)
+        if self.ChangePowerDialog.exec_()  == QDialog.Accepted:
+            self.power_dial.setValue(self.ChangePowerDialog.slider.value())
         
     def changeState(self):
         if self.on_button.isChecked(): # if button is checked
@@ -151,15 +165,14 @@ class TermostatWidget(QWidget):
             self.parent.set_enabled(self._id, False)
             
     def update_data(self, data):
-        self.temp_label.setText(f"{data.temperatur:.1f} °C")
-        self.temp_label.repaint()  # Tvinger en opdatering af labelen
-        self.sp_label.setText(f"(SP: {data.setpoint} °C)")
-        self.sp_label.repaint()  # Tvinger en opdatering af labelen
-#        data.enabled
-        self.power_dial.setValue(data.power)
-#        data.manual
-#        data.heating
- 
+        if (self.sensor_id == 0): 
+            self.power_dial.setValue(data.power)
+        else:
+            self.temp_label.setText(f"{data.temperatur:.1f} °C")
+            self.temp_label.repaint()  # Tvinger en opdatering af labelen
+            self.sp_label.setText(f"(SP: {data.setpoint} °C)")
+            self.sp_label.repaint()  # Tvinger en opdatering af labelen
+     
     def update_temperature(self, temperature, setpoint):
         # Opdater GUI'en med den modtagne temperatur
         self.temp_label.setText(f"{temperature:.1f} °C")
