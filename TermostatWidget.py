@@ -1,7 +1,55 @@
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushButton, QDial, QLineEdit, QSlider, QDialog, QGroupBox
 import ChangeSetpointDialog, ChangePowerDialog, SettingsDialog
+from datetime import datetime, timedelta
+import TermostatGraf
 
+class DataLogger:
+    def __init__(self):
+        self.log = []  # Gemmer data i hukommelsen som en liste af dicts
+
+    def log_data(self, data):
+        last_entry=self.get_last_entry()
+
+        if last_entry is None:
+            self.log.append({
+                'timestamp': datetime.now(),
+                'temperatur': data.temperatur,
+                'setpoint': data.setpoint,
+                'manual': data.manual,
+                'heating': data.heating,
+                'power': data.power
+            })
+        else:
+            if (datetime.now() - last_entry["timestamp"] > timedelta(minutes=1)): 
+                changed_data=True if ((last_entry["setpoint"] != data.setpoint) or (last_entry["heating"] != data.heating)  or (last_entry["manual"] != data.manual)) else False
+                if (changed_data):
+                    self.log.append({
+                        'timestamp': last_entry["timestamp"],
+                        'temperatur': last_entry["temperatur"],
+                        'setpoint': data.setpoint,
+                        'manual': data.manual,
+                        'heating': data.heating,
+                        'power': last_entry["power"]
+                    })
+
+                self.log.append({
+                    'timestamp': datetime.now(),
+                    'temperatur': data.temperatur,
+                    'setpoint': data.setpoint,
+                    'manual': data.manual,
+                    'heating': data.heating,
+                    'power': data.power
+                })
+
+    def get_log(self):
+        return self.log
+
+    def get_last_entry(self):
+        if len(self.log)==0:
+            return
+        return self.log[-1]
+    
 class TermoData():
     def __init__(self):
         self.temperature=0
@@ -37,7 +85,8 @@ class TermostatWidget(QWidget):
         self._id = termostat_id
         self.sensor_id = sensor_id
         self.parent = parent
-        
+
+        self.data_logger = DataLogger()
         self.on_button = QPushButton("Off", self)
         self.on_button.setCheckable(True) # setting checkable to true
         self.on_button.clicked.connect(self.changeState) # setting calling method by button
@@ -111,9 +160,10 @@ class TermostatWidget(QWidget):
             self.parent.set_power(self._id, self.power_dial.value())
 
     def create_auto_power(self):   
-        self.temp_label = QLabel("-- °C", self)
+        self.temp_label = ClickableLabel("-- °C", self)
         self.temp_label.setAlignment(Qt.AlignCenter)
         self.temp_label.setStyleSheet("font-size: 72px;")
+        self.temp_label.clicked.connect(self.open_termostat_graf)
         
         self.sp_label = ClickableLabel("(SP: -- °C)", self)
         self.sp_label.setAlignment(Qt.AlignCenter)
@@ -141,13 +191,21 @@ class TermostatWidget(QWidget):
         # Forbinder signalet til ændring af værdien med en slot (metode)
         self.power_dial.valueChanged.connect(self.updateLabel)
         
+    def open_termostat_graf(self):
+        # Åbner det nye vindue
+        self.TermostatGraf = TermostatGraf.TermostatGraf(self.title, parent=self)
+        self.TermostatGraf.show()
+        
     def open_setpoint_dialog(self):
         # Åbner det nye vindue
         self.ChangeSetpointDialog = ChangeSetpointDialog.ChangeSetpointDialog(self.title, 50)
         if self.ChangeSetpointDialog.exec_()  == QDialog.Accepted:
-            self.update_temperature(50,self.ChangeSetpointDialog.slider.value())
-            self.parent.set_setpoint(self._id, self.ChangeSetpointDialog.slider.value())
-        
+            self.update_setpoint(self.ChangeSetpointDialog.slider.value())
+
+    def update_setpoint(self, setpoint):
+        self.update_temperature(50, setpoint)
+        self.parent.set_setpoint(self._id, setpoint)
+            
     def open_power_dialog(self):
         # Åbner det nye vindue
         self.ChangePowerDialog = ChangePowerDialog.ChangePowerDialog(self.title, 50)
@@ -163,8 +221,13 @@ class TermostatWidget(QWidget):
             self.on_button.setStyleSheet("background-color : lightgrey") # set background color back to light-grey
             self.on_button.setText("Off")
             self.parent.set_enabled(self._id, False)
+
+    def log_data(self, data):
+        if (data.enabled):
+            self.data_logger.log_data(data)
             
     def update_data(self, data):
+        self.log_data(data)
         if (self.sensor_id == 0): 
             self.power_dial.setValue(data.power)
         else:
