@@ -257,8 +257,10 @@ class TermostatWidget(QWidget):
             self.sp_label.setText(f"(SP: {data.setpoint} °C)")
             self.sp_label.repaint()  # Tvinger en opdatering af labelen
             if (self.heating):
+                self.statustext.setText(f"Varmer")
                 self.statustext.setStyleSheet("font-size: 20px;background-color: yellow")
             else:
+                self.statustext.setText(f"Varmer ikke")
                 self.statustext.setStyleSheet("font-size: 20px;background-color: #e9e9e9;")
      
     def update_temperature(self, temperature, setpoint):

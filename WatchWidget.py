@@ -17,6 +17,8 @@ class TimerDialog(QDialog):
         self.minutes = seconds // 60  # 1 minut = 60 sekunder
         self.seconds = seconds % 60  # Resten af sekunderne efter minutterne
         
+        self.total_seconds = self.hours * 3600 + self.minutes * 60 + self.seconds
+        
         # Layout og inputfelter
         layout = QGridLayout()
         
@@ -101,7 +103,7 @@ class Watch(QWidget):
         
         self.watch = QLabel(self.get_time_as_text(), self)
         self.watch.setAlignment(Qt.AlignCenter)
-        self.watch.setStyleSheet("font-size: 40px;")
+        self.watch.setStyleSheet("font-size: 40px;color : black")
         
         self.watch_label = QLabel(name, self)
         self.watch_label.setAlignment(Qt.AlignCenter)
@@ -129,6 +131,10 @@ class Watch(QWidget):
 
     def paintEvent(self, event):
         self.watch.setText(self.get_time_as_text())
+        if (self.remainer_seconds<0):
+            self.watch.setStyleSheet("font-size: 40px;color : red")
+        else:
+            self.watch.setStyleSheet("font-size: 40px;color : black")
 
     def handle_timeout(self):
         if (self.running): 
@@ -166,6 +172,12 @@ class Watch(QWidget):
         self.remainer_seconds = self.seconds
         
     def get_time_as_text(self):
+        if (self.remainer_seconds<0):
+            sekunder=self.remainer_seconds*-1
+            timer = sekunder // 3600
+            minutter = (sekunder % 3600) // 60
+            sek = sekunder % 60
+            return f"{timer}:{minutter:02}:{sek:02}"
         return str(datetime.timedelta(seconds=self.remainer_seconds))
         
     def set_time(self, seconds):
