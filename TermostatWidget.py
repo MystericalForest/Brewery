@@ -2,7 +2,8 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout, QPushButton, QDial, QLineEdit, QSlider, QDialog, QGroupBox
 import ChangeSetpointDialog, ChangePowerDialog, SettingsDialog
 from datetime import datetime, timedelta
-import TermostatGraf
+import TermostatGraf2 as TermostatGraf
+import csv
 
 class DataLogger:
     def __init__(self):
@@ -21,7 +22,7 @@ class DataLogger:
                 'power': data.power
             })
         else:
-            if (datetime.now() - last_entry["timestamp"] > timedelta(minutes=1)): 
+            if (datetime.now() - last_entry["timestamp"] > timedelta(minutes=1)):
                 changed_data=True if ((last_entry["setpoint"] != data.setpoint) or (last_entry["heating"] != data.heating)  or (last_entry["manual"] != data.manual)) else False
                 if (changed_data):
                     self.log.append({
@@ -49,6 +50,18 @@ class DataLogger:
         if len(self.log)==0:
             return
         return self.log[-1]
+    
+    def save_to_file(self, filename='data_log.csv'):
+        with open(filename, mode='w', newline='') as file:
+            fieldnames = ['timestamp', 'temperatur', 'setpoint', 'manual', 'heating', 'power']
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            
+            writer.writeheader()
+            
+            for entry in self.log:
+                entry_copy = entry.copy()
+                entry_copy['timestamp'] = entry_copy['timestamp'].isoformat()
+                writer.writerow(entry_copy)
     
 class TermoData():
     def __init__(self):
@@ -85,6 +98,9 @@ class TermostatWidget(QWidget):
         self._id = termostat_id
         self.sensor_id = sensor_id
         self.parent = parent
+        self.temperature=0
+        self.heating=False
+        self.setpoint=0
 
         self.data_logger = DataLogger()
         self.on_button = QPushButton("Off", self)
@@ -193,7 +209,7 @@ class TermostatWidget(QWidget):
         
     def open_termostat_graf(self):
         # Åbner det nye vindue
-        self.TermostatGraf = TermostatGraf.TermostatGraf(self.title, parent=self)
+        self.TermostatGraf = TermostatGraf.TermostatGraf(self.title, self.data_logger, parent=self)
         self.TermostatGraf.show()
         
     def open_setpoint_dialog(self):
@@ -201,8 +217,10 @@ class TermostatWidget(QWidget):
         self.ChangeSetpointDialog = ChangeSetpointDialog.ChangeSetpointDialog(self.title, 50)
         if self.ChangeSetpointDialog.exec_()  == QDialog.Accepted:
             self.update_setpoint(self.ChangeSetpointDialog.slider.value())
+            self.setpoint=self.ChangeSetpointDialog.slider.value()
 
     def update_setpoint(self, setpoint):
+        self.setpoint=setpoint
         self.update_temperature(50, setpoint)
         self.parent.set_setpoint(self._id, setpoint)
             
@@ -228,15 +246,24 @@ class TermostatWidget(QWidget):
             
     def update_data(self, data):
         self.log_data(data)
+        self.heating = data.heating
         if (self.sensor_id == 0): 
             self.power_dial.setValue(data.power)
         else:
+            self.temperature=data.temperatur
+            self.setpoint=data.setpoint
             self.temp_label.setText(f"{data.temperatur:.1f} °C")
             self.temp_label.repaint()  # Tvinger en opdatering af labelen
             self.sp_label.setText(f"(SP: {data.setpoint} °C)")
             self.sp_label.repaint()  # Tvinger en opdatering af labelen
+            if (self.heating):
+                self.statustext.setStyleSheet("font-size: 20px;background-color: yellow")
+            else:
+                self.statustext.setStyleSheet("font-size: 20px;background-color: #e9e9e9;")
      
     def update_temperature(self, temperature, setpoint):
+        self.temperature=temperature
+        self.setpoint=setpoint
         # Opdater GUI'en med den modtagne temperatur
         self.temp_label.setText(f"{temperature:.1f} °C")
         self.temp_label.repaint()  # Tvinger en opdatering af labelen

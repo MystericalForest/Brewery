@@ -7,8 +7,13 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import QTimer, Qt
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import pandas as pd
 
 class TemperaturePlot(FigureCanvas):
+#    def __init__(self, name, log_data, parent=None):
+        df = pd.DataFrame(log_data)
+        df.set_index("timestamp", inplace=True)
+        
     def __init__(self, name, temperature_data, time_data, setpoint_data, heater_data, parent=None):
         self.fig, self.ax = plt.subplots()
         super().__init__(self.fig)
@@ -67,11 +72,15 @@ class TemperaturePlot(FigureCanvas):
         self.draw()
 
 class TermostatGraf(QMainWindow):
-    def __init__(self, name, parent=None):
+    def __init__(self, name, log_data=None, parent=None):
         super().__init__()
-        self.name=name
+        if (log_data is None):
+            self.name = name + ": Demodata"
+        else:
+            self.name = name
         self.setWindowTitle(self.name)
-        self.parent=parent
+        self.log_data = log_data
+        self.parent = parent
 
         # Setpoint og tilstand
         self.setpoint = 50.0
@@ -114,6 +123,7 @@ class TermostatGraf(QMainWindow):
         setpoint_data = [21,21,21,21,25,25,25,50]
         heater_data = [True, True, False, False, False, False, False, True]
         self.plot = TemperaturePlot(self.name, temperature_data, time_data, setpoint_data, heater_data, self)
+#        self.plot = TemperaturePlot(self.name, self.log_data, self)
 
         # Saml layout
         content_layout.addWidget(self.plot, stretch=3)
