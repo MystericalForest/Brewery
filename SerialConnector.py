@@ -68,6 +68,17 @@ class SerialConnector(QObject):
         self.send_data(data)
         return self.get_data()
         
+    def set_termostat_settings(self, termostat, kp, ki, kd, hysteresis):
+        payload ={'kp':kp,
+               'ki':ki,
+               'kd':kd,
+               'hysteresis':hysteresis}
+        
+        data ={'thermostat':termostat,
+               'setpoint':payload}
+        self.send_data(data)
+        return self.get_data()
+        
     def set_setpoint(self, termostat, value):
         data ={'thermostat':termostat,
                'setpoint':value}

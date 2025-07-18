@@ -101,6 +101,10 @@ class TermostatWidget(QWidget):
         self.temperature=0
         self.heating=False
         self.setpoint=0
+        self.kp=0
+        self.ki=0
+        self.kd=0
+        self.hysteresis=0.5
 
         self.data_logger = DataLogger()
         self.on_button = QPushButton("Off", self)

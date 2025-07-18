@@ -125,7 +125,7 @@ class TermostatGraf(QMainWindow):
             pass  # Ignorer ugyldigt input
 
     def save_data(self):
-        self.logger.save_to_file("Termostat_" + self.parent.title)
+        self.logger.save_to_file("Termostat_" + self.parent.title + ".csv")
         
     def update_plot(self):
         log = self.logger.get_log()
